@@ -56,5 +56,32 @@ in C.
 
 C is great. Don't let anyone tell you it's not.
 
+## Setup
+Download the [latest release](https://github.com/midnadimple/bastd/releases/latest)
+whenever you want to start a new project.
+
+All of your code is going to go in the root of this folder, and all the `bastd`
+code has been kept in the `bastd` folder. FOr convenience, the `bastd.c` file,
+which includes all other C files in the folder, stays in the top level
+directory, so you can easily include the file.
+
+So, open `main.c` and have a scroll through it to see some example code. Then,
+delete everything in the file and enter this basic skeleton:
+```c
+#include "bastd.c"
+
+CALLBACK Error
+start(Slice_S8 args, Buffer stdin, Buffer stdout)
+{
+	return Error_success;
+}
+```
+
+Now, you can compile the program with `build.bat` or `build.sh` to get an
+executable.
+
+Note that since you make a new copy of `bastd` for every project, the library
+is completely vendored and you can modify it however you'd like.
+
 ## LICENSE
 `bastd` is licensed under the 3-clause BSD license. See [LICENSE.md](LICENSE.md).
