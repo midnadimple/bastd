@@ -13,10 +13,10 @@ aims to be a sufficient and even superior replacement.
 - Making C a more "tolerable" language
 
 `bastd`'s features include:
-- [ ] No header files. They cause more harm than good in my opinion, and I prefer a
+- [x] No header files. They cause more harm than good in my opinion, and I prefer a
 single translation unit in my builds. You just include `bastd.c` at the top of
 your main C file and you start writing code.
-- [ ] Memory Allocators. The premier one is the
+- [x] Memory Allocators. The premier one is the
 [Arena Allocator](https://www.rfleury.com/p/untangling-lifetimes-the-arena-allocator),
 which acts as our generic allocator in place of `malloc`, providing a unfirom
 interface that simplifies memory management and groups allocations together
