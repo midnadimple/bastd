@@ -1,3 +1,5 @@
+#include "bastd.c"
+
 int
 main(void)
 {
