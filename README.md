@@ -13,25 +13,25 @@ aims to be a sufficient and even superior replacement.
 - Making C a more "tolerable" language
 
 `bastd`'s features include:
-- [x] No header files. They cause more harm than good in my opinion, and I prefer a
-single translation unit in my builds. You just include `bastd.c` at the top of
-your main C file and you start writing code.
-- [x] Memory Allocators. The premier one is the
-[Arena Allocator](https://www.rfleury.com/p/untangling-lifetimes-the-arena-allocator),
-which acts as our generic allocator in place of `malloc`, providing a unfirom
-interface that simplifies memory management and groups allocations together
-into clearly defined lifetimes
-- [ ] A Length-Based String Type + String Builder. This replaces whatever the hell
-`string.h` was meant to be, by introducing a length to strings, which allows
-for simple slicing of the string and modification.
+- [x] **No header files.** They cause more harm than good in my opinion, and I
+prefer a single translation unit in my builds. You just include `bastd.c` at
+the top of your main C file and you start writing code.
+- [x] **Memory Allocators**. The premier one is the
+[Arena Allocator](https://nullprogram.com/blog/2023/09/27/), which acts as our
+generic allocator in place of `malloc`, providing a unfirom interface that
+simplifies memory management and groups allocations together into clearly
+defined lifetimes
+- [x] **A Length-Based String Type**. By adding one variable to accompany a
+`char *`, almost all operations upon strings become infinitely easier.
+- [ ] A I/O system that supports both standard input/output and file
+input/output. It's built on a basic buffer type that you can flush to output
+data. This buffer type also acts as a **string builder**, by letting you append
+data to the buffer, then compile it to a string type.
+- [ ] A logging system built ontop of this I/O system. You can either log out to
+a file or to stdout.
 - [ ] Generic data-structures. The premier one is the
 [Dynamic Array](https://dylanfalconer.com/articles/dynamic-arrays-in-c), which
 brings the power of C++'s `std::vector` to C
-- [ ] A simple I/O system that supports both standard input/output and file
-input/output. It's built on a basic buffer type that you can flush to output
-data.
-- [ ] A logging system built ontop of this I/O system. You can either log out to
-a file or to stdout.
 - [ ] A simple GUI initialization system that gets you an OpenGL window with
 immediate-mode input
 - [ ] A basic 2D renderer built ontop of this graphics initializater, that can
