@@ -32,8 +32,8 @@ input/output. It's built on a basic buffer type that you can flush to output
 data.
 - [ ] A logging system built ontop of this I/O system. You can either log out to
 a file or to stdout.
-- [ ] A simple GUI initialization system that gets you an Direct3D 11 or OpenGL
-window with immediate-mode input.
+- [ ] A simple GUI initialization system that gets you an OpenGL window with
+immediate-mode input
 - [ ] A basic 2D renderer built ontop of this graphics initializater, that can
 draw shapes and textures to the screen. The shaders used can be customized for
 added effect. It features a simple camera system to seperate which parts of
