@@ -184,7 +184,7 @@ typedef U32 B32;
 
 #define STMNT(s) do{ s }while(0)
 
-#define ASSERT(x, msg) STMNT(if (!x) OS_DEBUGBREAK();)
+#define ASSERT(x, msg) STMNT(if (!x) os_DEBUGBREAK();)
 
 #define CONCAT_(a,b) a##b
 #define CONCAT(a,b) CONCAT_(a,b)

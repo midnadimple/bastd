@@ -2,7 +2,7 @@
 #define BASTD_MEM_C
 
 FUNCTION void *
-M_memorySet(void *buffer, U8 value, ISize length)
+m_memorySet(void *buffer, U8 value, ISize length)
 {
 	U8* p = buffer;
 	while (length-- > 0) {
@@ -12,7 +12,7 @@ M_memorySet(void *buffer, U8 value, ISize length)
 }
 
 FUNCTION void *
-M_memoryCopy(void *dst, void *src, size_t n) 
+m_memoryCopy(void *dst, void *src, size_t n) 
 { 
 	U8 *s = (U8 *)src; 
 	U8 *d = (U8 *)dst; 
@@ -30,25 +30,25 @@ M_memoryCopy(void *dst, void *src, size_t n)
   If new_size > 0, function like realloc and either resize or create
   If new_size <= 0, function like free and clear the memory
 */
-typedef void *(*M_AllocFunc)(void *ctx, void *ptr, ISize old_size, ISize new_size);
+typedef void *(*m_AllocFunc)(void *ctx, void *ptr, ISize old_size, ISize new_size);
 
-typedef struct M_Allocator M_Allocator; 
-struct M_Allocator {
-	M_AllocFunc alloc;
+typedef struct m_Allocator m_Allocator; 
+struct m_Allocator {
+	m_AllocFunc alloc;
 	void* ctx;
 };
 
-#define M_MAKE(T, n, a) ((T *)((a).alloc((a).ctx, NIL, 0, sizeof(T) * n)))
-#define M_RESIZE(p, o, n, a) ((a).alloc((a).ctx, p, sizeof(*(p)) * o, sizeof(*(p)) * n))
-#define M_RELEASE(p, s, a) ((a).alloc((a).ctx, p, sizeof(*(p)) * s, 0))
+#define m_MAKE(T, n, a) ((T *)((a).alloc((a).ctx, NIL, 0, sizeof(T) * n)))
+#define m_RESIZE(p, o, n, a) ((a).alloc((a).ctx, p, sizeof(*(p)) * o, sizeof(*(p)) * n))
+#define m_RELEASE(p, s, a) ((a).alloc((a).ctx, p, sizeof(*(p)) * s, 0))
 
 /* Linear Allocator (Arena)
    Allocates variably-sized regions from a fixed-size block of memory.
    A set of regions is freed by setting the allocator's offset to an earlier
    value.
 */
-typedef struct M_Arena M_Arena;
-struct M_Arena {
+typedef struct m_Arena m_Arena;
+struct m_Arena {
 	U8* beg;
 	U8* end;
 };
@@ -56,9 +56,9 @@ struct M_Arena {
 #define DEFAULT_ALIGNMENT (2 * sizeof(void *))
 
 FUNCTION void *
-M_Arena_alloc(void *ctx, void *ptr, ISize old_size, ISize new_size)
+m_Arena_alloc(void *ctx, void *ptr, ISize old_size, ISize new_size)
 {
-	M_Arena *a = (M_Arena *)ctx;
+	m_Arena *a = (m_Arena *)ctx;
 
 	if (new_size <= 0) {
 		/*  Arena can only free the most recent block. This allows to follow stack pattern.
@@ -90,11 +90,11 @@ M_Arena_alloc(void *ctx, void *ptr, ISize old_size, ISize new_size)
 			// New allocation;
 			p = a->beg + padding;
 			a->beg += padding + new_size;
-			p = M_memorySet(p, 0, new_size);
+			p = m_memorySet(p, 0, new_size);
 			
 			if (ptr != NIL) {
 				// Arbitrary block, copy data from old pointer
-				p = M_memoryCopy(p, ptr, old_size);
+				p = m_memoryCopy(p, ptr, old_size);
 			}
 		}
 
@@ -102,15 +102,15 @@ M_Arena_alloc(void *ctx, void *ptr, ISize old_size, ISize new_size)
 	}
 }
 
-FUNCTION M_Arena
-M_Arena_create(void* buffer, ISize capacity)
+FUNCTION m_Arena
+m_Arena_create(void* buffer, ISize capacity)
 {
-	M_Arena arena = {0};
+	m_Arena arena = {0};
 	arena.beg = (U8 *)buffer;
 	arena.end = arena.beg ? arena.beg + capacity : 0;
 	return arena;
 }
 
-#define M_ARENA_ALLOCATOR(a) (M_Allocator){M_Arena_alloc, (void *)&(a)}
+#define m_ARENA_ALLOCATOR(a) (m_Allocator){m_Arena_alloc, (void *)&(a)}
 
 #endif//BASTD_MEM_C

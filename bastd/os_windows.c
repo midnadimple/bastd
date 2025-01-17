@@ -3,7 +3,7 @@
 
 #include <windows.h>
 
-#define OS_DEBUGBREAK() __debugbreak();
+#define os_DEBUGBREAK() __debugbreak();
 
 FUNCTION void
 OS_Abort(S8 msg)
