@@ -9,7 +9,7 @@
 int
 main(void)
 {
-	m_Buddy buddy = m_Buddy_create(os_alloc(2 * GIGA), 2 * GIGA);
+	m_Buddy buddy = m_Buddy_create(os_alloc(2 * MEGA), 2 * MEGA);
 	m_Allocator perm = m_BUDDY_ALLOCATOR(buddy);
 
 	// Slices can be created with a backing array to start with.

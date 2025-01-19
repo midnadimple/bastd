@@ -203,7 +203,6 @@ typedef U8 B8;
 // Includes
 #include "bastd/os.c"
 #include "bastd/memory.c"
-#include "bastd/builtins.c"
 #include "bastd/string.c"
 
 #endif //BASTD_C
