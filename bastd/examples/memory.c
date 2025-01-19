@@ -3,9 +3,13 @@
 int
 main(void)
 {
-	ISize buffer_size = 100 * sizeof(U8);
-	m_Arena arena = m_Arena_create(OS_Alloc(buffer_size), buffer_size);
-	m_Allocator permanent_allocator = m_ARENA_ALLOCATOR(arena);
+	ISize buffer_size = 2 * KILO;
+
+	/* Arena allocator allocates new values at an incrementing offset, and can
+	   only free by resetting the beginning pointer to a previous offset
+	*/
+	m_Arena arena = m_Arena_create(os_alloc(buffer_size), buffer_size);
+	m_Allocator arena_allocator = m_ARENA_ALLOCATOR(arena);
 
 	{
 		/* By cloning an arena at the start of the scope, all changes to the
@@ -15,29 +19,62 @@ main(void)
 		m_Arena scratch_arena = arena;
 		m_Allocator scratch_allocator = m_ARENA_ALLOCATOR(scratch_arena);
 
-		U8* array = m_MAKE(U8, 20, scratch_allocator);
+		U8* array = m_MAKE(U8, 20, &scratch_allocator);
 		for (int i = 0; i < 20; i++) {
 			array[i] = i;
 		}
 	} // Auto clears here
-
 	os_DEBUGBREAK();
 
-	U8* array = m_MAKE(U8, 10, permanent_allocator);
+	// The same can be accomplished by saving the arena's offset, then restoring it
+	m_ArenaOffset savepoint = m_Arena_getOffset(arena);
+
+	U8* temp_array = m_MAKE(U8, 20, &arena_allocator);
+	for (int i = 0; i < 20; i++) {
+		temp_array[i] = i;
+	}
+
+	m_Arena_setOffset(&arena, savepoint); // Clears here
+	
+	os_DEBUGBREAK();
+
+	U8* array = m_MAKE(U8, 10, &arena_allocator);
 	for (int i = 10; i-- > 0;) {
 		array[10 - i] = i;
 	}
-	os_DEBUGBREAK();
 
-	array = m_RESIZE(array, 10, 20, permanent_allocator);
+	// Arenas allow for the resizing of blocks.
+	os_DEBUGBREAK();
+	array = m_RESIZE(array, 10, 20, &arena_allocator);
 	for (int i = 20; i-- > 0;) {
 		array[20 - i] = i;
 	}
+
 	os_DEBUGBREAK();
 
-	m_RELEASE(array, 20, permanent_allocator);
-	F64 *vector2 = m_MAKE(F32, 2, permanent_allocator);
-	vector2[0] = 0x1.921fb6p+1f;
-	vector2[1] = 490875;
+	/* For an arena allocator, you can deallocate the last block allcoated on
+	   the arena.
+	*/
+	m_RELEASE(array, 20, &arena_allocator);
+	os_DEBUGBREAK();
+
+	/* Buddy allocator is more general-purpose than arena allocator, but is
+	   slower and should preferrably be used for long-lasting allocations, 
+	   rather than temporary ones.
+	*/
+	m_Buddy buddy = m_Buddy_create(os_alloc(buffer_size), buffer_size);
+	m_Allocator buddy_allocator = m_BUDDY_ALLOCATOR(buddy);
+
+	// You can allocate and deallocate any sized object in any order
+	U8 *file = m_MAKE(U8, 20, &buddy_allocator);
+	F32 *vec2 = m_MAKE(F32, 2, &buddy_allocator);
+	char *raw_str = m_MAKE(char, 50, &buddy_allocator);
+
+	os_DEBUGBREAK();
+	
+	m_RELEASE(vec2, 2, &buddy_allocator);
+	m_RELEASE(raw_str, 50, &buddy_allocator);
+	m_RELEASE(file, 20, &buddy_allocator);
+
 	os_DEBUGBREAK();
 }

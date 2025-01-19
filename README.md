@@ -29,7 +29,7 @@ data. This buffer type also acts as a **string builder**, by letting you append
 data to the buffer, then compile it to a string type.
 - [ ] A logging system built ontop of this I/O system. You can either log out to
 a file or to stdout.
-- [ ] Generic data-structures. The premier one is the
+- [x] Generic data-structures. The premier one is the
 [Dynamic Array](https://dylanfalconer.com/articles/dynamic-arrays-in-c), which
 brings the power of C++'s `std::vector` to C
 - [ ] A simple GUI initialization system that gets you an OpenGL window with
@@ -55,6 +55,10 @@ Almost all OS libraries, Graphics libraries, Audio libraries, etc. are written
 in C.
 
 C is great. Don't let anyone tell you it's not.
+
+## Examples
+You can change the build script to any of the examples. Once built, you should
+step through each example in a debugger in order to see how the programs work.
 
 ## Setup
 Download the [latest release](https://github.com/midnadimple/bastd/releases/latest)

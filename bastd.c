@@ -173,7 +173,7 @@ typedef uintptr_t UPtr;
 typedef ptrdiff_t ISize;
 typedef size_t USize;
 
-typedef U32 B32;
+typedef U8 B8;
 #define TRUE 1
 #define FALSE 0
 
@@ -194,9 +194,16 @@ typedef U32 B32;
 #define COUNT_OF(a) (ISize)(sizeof(a) / sizeof(*(a)))
 #define LENGTH_OF(s) (COUNT_OF(s) - 1)
 
+#define KILO (1024)
+#define MEGA (KILO * 1024)
+#define GIGA (MEGA * 1024)
+#define TERA (GIGA * 1024)
+#define PETA (TERA * 1024)
+
 // Includes
+#include "bastd/os.c"
+#include "bastd/memory.c"
+#include "bastd/builtins.c"
 #include "bastd/string.c"
-#include "bastd/os_windows.c"
-#include "bastd/mem.c"
 
 #endif //BASTD_C

@@ -1,8 +1,8 @@
 #ifndef BASTD_OS_C
 #define BASTD_OS_C
 
-FUNCTION void OS_Abort(S8 msg);
-FUNCTION void *OS_Alloc(ISize cap);
+FUNCTION void os_abort(char *msg);
+FUNCTION void *os_alloc(ISize cap);
 
 #if defined(OS_WINDOWS)
 

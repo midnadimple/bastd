@@ -5,8 +5,10 @@ pushd build
 
 REM Uncomment one of these to run an example. Try it! They're great documentation.
 REM cl /Zi ..\bastd\examples\memory.c
+REM cl /Zi ..\bastd\examples\fib_slice.c 
+cl /Zi ..\bastd\examples\string.c 
 
 REM This builds your application with debug symbols.
-cl /Zi ..\bastd\examples\memory.c
+REM cl /Zi ..\main.c
 
 popd
