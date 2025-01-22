@@ -212,5 +212,6 @@ typedef U8 B8;
 #include "bastd/memory.c"
 #include "bastd/string.c"
 #include "bastd/buffer.c"
+#include "bastd/args.c"
 
 #endif //BASTD_C

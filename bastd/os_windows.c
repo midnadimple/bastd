@@ -2,6 +2,7 @@
 #define BASTD_OS_WINDOWS_C
 
 #include <windows.h>
+#include <shellapi.h>
 #include <io.h>
 
 #define os_DEBUGBREAK() __debugbreak();
@@ -82,6 +83,27 @@ FUNCTION B8
 os_closeFile(int fd)
 {
     return _close(fd);
+}
+
+FUNCTION char **
+os_getArgcAndArgv(int *argc)
+{
+    char** wargv = CommandLineToArgvW(GetCommandLineW(), argc);
+
+    int n = 0;
+    for (int i = 0; i < *argc;  i++)
+        n += WideCharToMultiByte( CP_UTF8, 0, wargv[i], -1, NIL, 0, NIL, NIL ) + 1;
+    
+    char **argv = os_alloc( (*argc + 1) * sizeof(char *) + n );
+
+    char *arg = (char *)&(argv[*argc + 1]);
+    for (int i = 0; i < *argc; i++) {
+        argv[i] = arg;
+        arg += WideCharToMultiByte( CP_UTF8, 0, wargv[i], -1, arg, n, NIL, NIL ) + 1;
+    }
+    argv[*argc] = NIL;
+
+    return argv;
 }
 
 #if defined(BASTD_CLI)

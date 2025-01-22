@@ -13,9 +13,9 @@ struct RenderVertex { // struct names use PascalCase
 	F32 x, y, z;
 };
 
-// Generic pattern. the output type will be "Slice_RenderVertex"
-// #define SLICE_TYPE RenderVertex
-// #include "slice.h"
+// Generic pattern. the output type will be "sl_RenderVertex"
+#define sl_TYPE RenderVertex
+#include "bastd/slice.c"
 
 // all functions prefixed with "FUNCTION" macro, which expands to "static"
 FUNCTION I8 // primitive types follow rust style
@@ -37,9 +37,16 @@ os_entry(void)
 	   "m_TypeName_functionName". "m" is a lower-case shortened version of the
 	   module's name (usually 1-3 letters).
 	*/
+	
+	m_Buddy buddy = m_Buddy_create(os_alloc(MEGA(2)), MEGA(2));
+	m_Allocator buddy_allocator = m_BUDDY_ALLOCATOR(buddy);
+	sl_S8 args = getArgsSlice(&buddy_allocator);
+
 	Buffer buf = BUFFER(os_alloc(KILO(2)), KILO(2));
-	Buffer_appendS8(&buf, S8("Trust me, this is cool"));
+	Buffer_appendS8(&buf, S8("Trust me, this is cool\n"));
+	Buffer_appendS8(&buf, sl_S8_pop(&args)); // should print the last argument given to the command
 	Buffer_standardOutput(&buf);
+
 
 // 	r_Window window = r_Window_create(1280, 720, "Bastd Example");
 // 	I32 frame_number = 0;
