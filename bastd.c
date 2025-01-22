@@ -178,6 +178,8 @@ typedef U8 B8;
 #define FALSE 0
 
 // Macros
+#define CALLBACK_EXPORT
+
 #define FUNCTION static
 #define GLOBAL_VAR static
 #define LOCAL_PERSIST static
@@ -194,15 +196,21 @@ typedef U8 B8;
 #define COUNT_OF(a) (ISize)(sizeof(a) / sizeof(*(a)))
 #define LENGTH_OF(s) (COUNT_OF(s) - 1)
 
-#define KILO (1024)
-#define MEGA (KILO * 1024)
-#define GIGA (MEGA * 1024)
-#define TERA (GIGA * 1024)
-#define PETA (TERA * 1024)
+#define KILO(n) (n << 10)
+#define MEGA(n) (n << 20)
+#define GIGA(n) (n << 30)
+#define TERA(n) (n << 40)
+#define PETA(n) (n << 50)
+
+// User Config Flags
+#if !defined(BASTD_CLI) && !defined(BASTD_GUI)
+#error "BASTD_CLI or BASTD_GUI must be defined to set the approriate entry point
+#endif
 
 // Includes
 #include "bastd/os.c"
 #include "bastd/memory.c"
 #include "bastd/string.c"
+#include "bastd/buffer.c"
 
 #endif //BASTD_C

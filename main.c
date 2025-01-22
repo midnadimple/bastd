@@ -1,3 +1,4 @@
+#define BASTD_CLI
 #include "bastd.c"
 
 // Single line
@@ -29,15 +30,16 @@ addTwo(I8 a, I8 b) // Function names use camelCase
    defined as "static" , incase you decide to move it to a different
    compilation unit
 */
-// CALLBACK Error
-// start(Slice_S8 args, Buffer stdin, Buffer stdout)
-// {
-// 	/* all functions that belong to a type or a module are styled
-// 	   "m_TypeName_functionName". "m" is a lower-case shortened version of the
-// 	   module's name (usually 1-3 letters).
-// 	*/
-// 	Buffer_appendS8(&stdout, args[0]);
-// 	Buffer_flush(&stdout);
+CALLBACK_EXPORT os_ErrorCode
+os_entry(void)
+{
+	/* all functions that belong to a type or a module are styled
+	   "m_TypeName_functionName". "m" is a lower-case shortened version of the
+	   module's name (usually 1-3 letters).
+	*/
+	Buffer buf = BUFFER(os_alloc(KILO(2)), KILO(2));
+	Buffer_appendS8(&buf, S8("Trust me, this is cool"));
+	Buffer_standardOutput(&buf);
 
 // 	r_Window window = r_Window_create(1280, 720, "Bastd Example");
 // 	I32 frame_number = 0;
@@ -56,5 +58,5 @@ addTwo(I8 a, I8 b) // Function names use camelCase
 
 // 	/* Enum names are styled with PascalCase. Enum values are styled
 // 	   "TypeName_value_name"*/
-// 	return Error_success;
-// }
+	return os_ErrorCode_success;
+}

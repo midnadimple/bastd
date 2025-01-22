@@ -1,9 +1,10 @@
+#define BASTD_CLI
 #include "..\..\bastd.c"
 
-int
-main(void)
+CALLBACK_EXPORT os_ErrorCode
+os_entry(void)
 {
-	ISize buffer_size = 2 * KILO;
+	ISize buffer_size = KILO(2);
 
 	/* Arena allocator allocates new values at an incrementing offset, and can
 	   only free by resetting the beginning pointer to a previous offset
@@ -24,8 +25,6 @@ main(void)
 			array[i] = i;
 		}
 	} // Auto clears here
-	os_DEBUGBREAK();
-
 	// The same can be accomplished by saving the arena's offset, then restoring it
 	m_ArenaOffset savepoint = m_Arena_getOffset(arena);
 
@@ -35,8 +34,6 @@ main(void)
 	}
 
 	m_Arena_setOffset(&arena, savepoint); // Clears here
-	
-	os_DEBUGBREAK();
 
 	U8* array = m_MAKE(U8, 10, &arena_allocator);
 	for (int i = 10; i-- > 0;) {
@@ -44,19 +41,16 @@ main(void)
 	}
 
 	// Arenas allow for the resizing of blocks.
-	os_DEBUGBREAK();
 	array = m_RESIZE(array, 10, 20, &arena_allocator);
 	for (int i = 20; i-- > 0;) {
 		array[20 - i] = i;
 	}
 
-	os_DEBUGBREAK();
 
 	/* For an arena allocator, you can deallocate the last block allcoated on
 	   the arena.
 	*/
 	m_RELEASE(array, 20, &arena_allocator);
-	os_DEBUGBREAK();
 
 	/* Buddy allocator is more general-purpose than arena allocator, but is
 	   slower and should preferrably be used for long-lasting allocations, 
@@ -69,12 +63,10 @@ main(void)
 	U8 *file = m_MAKE(U8, 20, &buddy_allocator);
 	F32 *vec2 = m_MAKE(F32, 2, &buddy_allocator);
 	char *raw_str = m_MAKE(char, 50, &buddy_allocator);
-
-	os_DEBUGBREAK();
 	
 	m_RELEASE(vec2, 2, &buddy_allocator);
 	m_RELEASE(raw_str, 50, &buddy_allocator);
 	m_RELEASE(file, 20, &buddy_allocator);
 
-	os_DEBUGBREAK();
+	return os_ErrorCode_success;
 }

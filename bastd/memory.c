@@ -89,7 +89,7 @@ m_Arena_alloc(void *ctx, void *ptr, ISize old_size, ISize new_size)
 		// Allocate a block
 		ASSERT(new_size > old_size, "Can't reallocate to a smaller block");
 
-		ISize padding = -(UPtr)a->beg & (DEFAULT_ALIGNMENT - 1);
+		ISize padding = (UPtr)a->beg & (DEFAULT_ALIGNMENT - 1);
 		ISize available = a->end - a->beg - padding;
 
 		if (available < 0 || new_size > available) {
@@ -260,7 +260,7 @@ m_Buddy_create(void *data, ISize size)
 		res.alignment = sizeof(m_BuddyBlock);
 	}
 
-	ASSERT((UPtr)data & res.alignment == 0, "Data not aligned to minimum alignment");
+	ASSERT(((UPtr)data & res.alignment) == 0, "Data not aligned to minimum alignment");
 
 	res.head = (m_BuddyBlock *)data;
 	res.head->size = size;
@@ -330,8 +330,8 @@ m_Buddy_alloc(void *ctx, void *ptr, ISize old_size, ISize new_size) {
 	if (new_size <= 0 && ptr != NIL) {
 		m_BuddyBlock *block;
 		
-		ASSERT(b->head <= ptr, "Head is greater than pointer to free");
-		ASSERT(ptr < b->tail, "Tail is less than pointer to free");
+		// ASSERT((void *)b->head <= ptr, "Head is greater than pointer to free");
+		// ASSERT(ptr < (void *)b->tail, "Tail is less than pointer to free");
 		
 		block = (m_BuddyBlock *)((char *)ptr - b->alignment);
 		block->is_free = TRUE;
