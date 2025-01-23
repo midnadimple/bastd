@@ -2,7 +2,7 @@
 #define BASTD_MEM_C
 
 FUNCTION void *
-m_memorySet(void *buffer, U8 value, ISize length)
+m_memorySet(void *buffer, U8 value, U64 length)
 {
 	U8* p = buffer;
 	while (length-- > 0) {
@@ -12,26 +12,26 @@ m_memorySet(void *buffer, U8 value, ISize length)
 }
 
 FUNCTION void *
-m_memoryCopy(void *dst, void *src, ISize n) 
+m_memoryCopy(void *dst, void *src, U64 n) 
 { 
 	U8 *s = (U8 *)src; 
 	U8 *d = (U8 *)dst; 
 
-	for (ISize i = 0; i < n; i++) {
+	for (U64 i = 0; i < n; i++) {
 		d[i] = s[i]; 
 	}
 
 	return dst;
 }
 
-FUNCTION ISize
-m_memoryDifference(void *dst, void *src, ISize n)
+FUNCTION U64
+m_memoryDifference(void *dst, void *src, U64 n)
 {
 	U8 *s = (U8 *)src; 
 	U8 *d = (U8 *)dst; 
 
-	ISize count = 0;
-	for (ISize i = 0; i < n; i++) {
+	U64 count = 0;
+	for (U64 i = 0; i < n; i++) {
 		if (d[i] != s[i]) {
 			count++;
 		}
@@ -46,7 +46,7 @@ m_memoryDifference(void *dst, void *src, ISize n)
   If new_size > 0, function like realloc and either resize or create
   If new_size <= 0, function like free and clear the memory
 */
-typedef void *(*m_AllocFunc)(void *ctx, void *ptr, ISize old_size, ISize new_size);
+typedef void *(*m_AllocFunc)(void *ctx, void *ptr, U64 old_size, U64 new_size);
 
 typedef struct m_Allocator m_Allocator; 
 struct m_Allocator {
@@ -74,7 +74,7 @@ struct m_Arena {
 #define DEFAULT_ALIGNMENT (2 * sizeof(void *))
 
 FUNCTION void *
-m_Arena_alloc(void *ctx, void *ptr, ISize old_size, ISize new_size)
+m_Arena_alloc(void *ctx, void *ptr, U64 old_size, U64 new_size)
 {
 	m_Arena *a = (m_Arena *)ctx;
 
@@ -82,15 +82,15 @@ m_Arena_alloc(void *ctx, void *ptr, ISize old_size, ISize new_size)
 		/*  Arena can only free the most recent block. This allows to follow stack pattern.
 			All we do is move the beginning pointer back the size of the allocation.
 		*/
-		ISize padding = -old_size & (DEFAULT_ALIGNMENT - 1);
+		U64 padding = -old_size & (DEFAULT_ALIGNMENT - 1);
 		a->beg -= (old_size + padding);
 		return NIL;
 	} else {
 		// Allocate a block
 		ASSERT(new_size > old_size, "Can't reallocate to a smaller block");
 
-		ISize padding = (UPtr)a->beg & (DEFAULT_ALIGNMENT - 1);
-		ISize available = a->end - a->beg - padding;
+		U64 padding = (UPtr)a->beg & (DEFAULT_ALIGNMENT - 1);
+		U64 available = a->end - a->beg - padding;
 
 		if (available < 0 || new_size > available) {
 			os_abort("Out of Memory!");
@@ -119,7 +119,7 @@ m_Arena_alloc(void *ctx, void *ptr, ISize old_size, ISize new_size)
 }
 
 FUNCTION m_Arena
-m_Arena_create(void* buffer, ISize capacity)
+m_Arena_create(void* buffer, U64 capacity)
 {
 	m_Arena arena = {0};
 	arena.beg = (U8 *)buffer;
@@ -154,7 +154,7 @@ m_Arena_setOffset(m_Arena *arena, m_ArenaOffset offset)
 */
 typedef struct m_BuddyBlock m_BuddyBlock;
 struct m_BuddyBlock {
-	ISize size;
+	U64 size;
 	B8 is_free;
 };
 
@@ -165,11 +165,11 @@ m_BuddyBlock_next(m_BuddyBlock *block)
 }
 
 FUNCTION m_BuddyBlock *
-m_BuddyBlock_split(m_BuddyBlock *block, ISize size)
+m_BuddyBlock_split(m_BuddyBlock *block, U64 size)
 {
 	if (block != NIL && size != 0) {
 		while (size < block->size) {
-			ISize sz = block->size >> 1;
+			U64 sz = block->size >> 1;
 			block->size = sz;
 			block = m_BuddyBlock_next(block);
 			block->size = sz;
@@ -185,7 +185,7 @@ m_BuddyBlock_split(m_BuddyBlock *block, ISize size)
 }
 
 FUNCTION m_BuddyBlock *
-m_BuddyBlock_findBest(m_BuddyBlock *head, m_BuddyBlock *tail, ISize size)
+m_BuddyBlock_findBest(m_BuddyBlock *head, m_BuddyBlock *tail, U64 size)
 {
 	m_BuddyBlock *best_block = NIL;
 	m_BuddyBlock *block = head;
@@ -248,11 +248,11 @@ typedef struct m_Buddy m_Buddy;
 struct m_Buddy {
 	m_BuddyBlock *head;
 	m_BuddyBlock *tail;
-	ISize alignment;
+	U64 alignment;
 };
 
 FUNCTION m_Buddy
-m_Buddy_create(void *data, ISize size)
+m_Buddy_create(void *data, U64 size)
 {
 	m_Buddy res = {0};
 	res.alignment = DEFAULT_ALIGNMENT;
@@ -271,12 +271,12 @@ m_Buddy_create(void *data, ISize size)
 	return res;
 }
 
-FUNCTION ISize
-m_Buddy_requiredSize(m_Buddy *b, ISize size) {
-    ISize actual_size = b->alignment;
+FUNCTION U64
+m_Buddy_requiredSize(m_Buddy *b, U64 size) {
+    U64 actual_size = b->alignment;
     
     size += sizeof(m_BuddyBlock);
-    ISize padding = -size & (b->alignment - 1); 
+    U64 padding = -size & (b->alignment - 1); 
 	size += b->alignment + padding;
     
     while (size > actual_size) {
@@ -324,7 +324,7 @@ m_Buddy_coalesce(m_BuddyBlock *head, m_BuddyBlock *tail) {
 }
 
 FUNCTION void *
-m_Buddy_alloc(void *ctx, void *ptr, ISize old_size, ISize new_size) {
+m_Buddy_alloc(void *ctx, void *ptr, U64 old_size, U64 new_size) {
 	m_Buddy *b = (m_Buddy *)ctx;
 
 	if (new_size <= 0 && ptr != NIL) {

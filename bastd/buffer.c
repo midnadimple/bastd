@@ -4,8 +4,8 @@
 typedef struct Buffer Buffer;
 struct Buffer {
 	U8 *raw;
-	ISize cap;
-	ISize len;
+	U64 cap;
+	U64 len;
 	B8 error;
 };
 
@@ -76,11 +76,11 @@ Buffer_fileOutput(Buffer *b, S8 filename)
 }
 
 FUNCTION void
-Buffer_append(Buffer *b, U8 *src, ISize len)
+Buffer_append(Buffer *b, U8 *src, U64 len)
 {
-	ISize available = b->cap - b->len;
-	ISize amount = available < len ? available : len;
-	for (ISize i = 0; i < amount; i++) {
+	U64 available = b->cap - b->len;
+	U64 amount = available < len ? available : len;
+	for (U64 i = 0; i < amount; i++) {
 		b->raw[b->len + i] = src[i];
 	}
 	b->len += amount;
@@ -120,13 +120,13 @@ Buffer_appendPtr(Buffer *b, void *p)
 {
     Buffer_appendS8(b, S8("0x"));
     UPtr u = (UPtr)p;
-    for (ISize i = 2*sizeof(u) - 1; i >= 0; i--) {
+    for (U64 i = 2*sizeof(u) - 1; i >= 0; i--) {
         Buffer_appendU8(b, "0123456789abcdef"[(u>>(4*i))&15]);
     }
 }
 
 FUNCTION void
-Buffer_appendF64(Buffer *b, F64 x, ISize num_decimals)
+Buffer_appendF64(Buffer *b, F64 x, U64 num_decimals)
 {
 	F64 prec = 10 ^ num_decimals;
 
@@ -167,7 +167,7 @@ Buffer_appendFile(Buffer *b, S8 filename, m_Allocator *perm)
 }
 
 FUNCTION void
-Buffer_appendStandardInput(Buffer *b, ISize max_read_size, m_Allocator *perm)
+Buffer_appendStandardInput(Buffer *b, U64 max_read_size, m_Allocator *perm)
 {
 	int stdin_fd = 0;
 	U32 len = 0;

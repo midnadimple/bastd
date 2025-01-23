@@ -37,8 +37,7 @@ os_entry(void)
 	   "m_TypeName_functionName". "m" is a lower-case shortened version of the
 	   module's name (usually 1-3 letters).
 	*/
-	
-	m_Buddy buddy = m_Buddy_create(os_alloc(MEGA(2)), MEGA(2));
+	m_Buddy buddy = m_Buddy_create(os_alloc(GIGA(2)), GIGA(2));
 	m_Allocator buddy_allocator = m_BUDDY_ALLOCATOR(buddy);
 	sl_S8 args = getArgsSlice(&buddy_allocator);
 

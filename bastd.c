@@ -193,14 +193,12 @@ typedef U8 B8;
 
 #define NIL 0
 
-#define COUNT_OF(a) (ISize)(sizeof(a) / sizeof(*(a)))
+#define COUNT_OF(a) (U64)(sizeof(a) / sizeof(*(a)))
 #define LENGTH_OF(s) (COUNT_OF(s) - 1)
 
-#define KILO(n) (n << 10)
-#define MEGA(n) (n << 20)
-#define GIGA(n) (n << 30)
-#define TERA(n) (n << 40)
-#define PETA(n) (n << 50)
+#define KILO(x) ((x) * 1024LL)
+#define MEGA(x) (KILO(x) * 1024LL)
+#define GIGA(x) (MEGA(x) * 1024LL)
 
 // User Config Flags
 #if !defined(BASTD_CLI) && !defined(BASTD_GUI)

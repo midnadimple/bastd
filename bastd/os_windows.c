@@ -17,7 +17,7 @@ os_abort(char *msg)
 }
 
 FUNCTION void *
-os_alloc(ISize cap)
+os_alloc(U64 cap)
 {
 	return VirtualAlloc(NIL, cap, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 }
@@ -53,7 +53,7 @@ os_read(int fd, U8 *buf, int len, U32 *bytes_read)
     }
 }
 
-FUNCTION ISize
+FUNCTION U64
 os_getFileSize(int fd)
 {
     HANDLE h = GetStdHandle(-10 - fd); 
@@ -64,7 +64,7 @@ os_getFileSize(int fd)
 
     LARGE_INTEGER file_size;
     GetFileSizeEx(h, &file_size);
-    return (ISize)file_size.QuadPart;
+    return (U64)file_size.QuadPart;
 }
 
 FUNCTION int

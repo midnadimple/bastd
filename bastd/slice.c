@@ -8,12 +8,12 @@
 typedef struct sl_NAME sl_NAME;
 struct sl_NAME {
 	sl_TYPE *elems;
-	ISize len;
-	ISize cap;
+	U64 len;
+	U64 cap;
 };
 
 FUNCTION sl_NAME
-CONCAT(sl_NAME, _create) (sl_TYPE *initial_data, ISize initial_len)
+CONCAT(sl_NAME, _create) (sl_TYPE *initial_data, U64 initial_len)
 {
 	sl_NAME res = {0};
 	res.elems = initial_data;
@@ -30,7 +30,7 @@ CONCAT(sl_NAME, _push) (sl_NAME *slice, m_Allocator *perm)
 	if (slice->len >= slice->cap) {
 		// Slice is full, Grow slice to double its current size
 		slice->cap = slice->cap ? slice->cap : 1;
-		ISize current_size = sizeof(*slice->elems) * slice->cap;
+		U64 current_size = sizeof(*slice->elems) * slice->cap;
 		slice->elems = perm->alloc(perm->ctx, slice->elems, current_size, current_size*2);
 		slice->cap *= 2;
 	}

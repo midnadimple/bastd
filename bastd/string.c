@@ -3,7 +3,7 @@
 
 typedef struct S8 S8;
 struct S8 {
-	ISize len;
+	U64 len;
 	U8 *raw;
 };
 
@@ -13,7 +13,7 @@ struct S8 {
 #define S8(s) (S8){.len = LENGTH_OF(s), .raw = (U8 *)s}
 
 FUNCTION S8
-S8_alloc(ISize len, m_Allocator *perm)
+S8_alloc(U64 len, m_Allocator *perm)
 {
 	S8 res = {0};
 	res.len = len;
@@ -22,10 +22,19 @@ S8_alloc(ISize len, m_Allocator *perm)
 	return res;
 }
 
+FUNCTION ISize
+S8_difference(S8 s1, S8 s2)
+{
+	if (s1.len != s2.len) {
+		return SIZE_MAX;
+	}
+	return m_memoryDifference(s1.raw, s2.raw, s1.len);
+}
+
 FUNCTION S8
 S8_concat(S8 s1, S8 s2, m_Allocator *perm)
 {
-	ISize len = s1.len + s2.len;
+	U64 len = s1.len + s2.len;
 	S8 s = S8_alloc(len, perm);
 	m_memoryCopy(s.raw, s1.raw, s1.len);
 	m_memoryCopy(&s.raw[s1.len], s2.raw, s2.len);
@@ -33,7 +42,7 @@ S8_concat(S8 s1, S8 s2, m_Allocator *perm)
 }
 
 FUNCTION S8
-S8_sub(S8 s, ISize start, ISize end, m_Allocator *perm)
+S8_sub(S8 s, U64 start, U64 end, m_Allocator *perm)
 {
 	S8 res = {0};
 	if (end <= s.len && start < end) {
@@ -47,7 +56,7 @@ FUNCTION B8
 S8_contains(S8 haystack, S8 needle)
 {
 	B8 found = FALSE;
-	for (ISize i = 0, j = 0; i < haystack.len && !found; i++) {
+	for (U64 i = 0, j = 0; i < haystack.len && !found; i++) {
 		while (haystack.raw[i] == needle.raw[j]) {
 			j += 1;
 			i += 1;
@@ -60,12 +69,12 @@ S8_contains(S8 haystack, S8 needle)
 	return found;
 }
 
-FUNCTION ISize
+FUNCTION U64
 S8_indexOf(S8 haystack, S8 needle)
 {
-	for (ISize i = 0; i < haystack.len; i += 1) {
-		ISize j = 0;
-		ISize start = i;
+	for (U64 i = 0; i < haystack.len; i += 1) {
+		U64 j = 0;
+		U64 start = i;
 		while (haystack.raw[i] == needle.raw[j]) {
 			j += 1;
 			i += 1;
@@ -74,14 +83,14 @@ S8_indexOf(S8 haystack, S8 needle)
 			}
 		}
 	}
-	return (ISize)-1;
+	return (U64)-1;
 }
 
 FUNCTION S8
 S8_subView(S8 haystack, S8 needle)
 {
 	S8 r = {0};
-	ISize start_index = S8_indexOf(haystack, needle);
+	U64 start_index = S8_indexOf(haystack, needle);
 	if (start_index < haystack.len) {
 		r.raw = &haystack.raw[start_index];
 		r.len = needle.len;
@@ -99,7 +108,7 @@ S8_equal(S8 a, S8 b)
 }
 
 FUNCTION S8
-S8_view(S8 s, ISize start, ISize end)
+S8_view(S8 s, U64 start, U64 end)
 {
 	if (end < start || end - start > s.len) {
 		return (S8){0};
@@ -123,15 +132,15 @@ FUNCTION sl_S8
 S8_split(S8 s, S8 delimiter, m_Allocator *perm)
 {
 	sl_S8 arr = sl_S8_create(NIL, 0);
-	ISize start = 0;
-	for (ISize i = 0; i < s.len; i += 1) {
+	U64 start = 0;
+	for (U64 i = 0; i < s.len; i += 1) {
 		if (s.raw[i] != delimiter.raw[0]) {
 			continue;
 		}
 
 		if (m_memoryDifference(&s.raw[i], delimiter.raw, delimiter.len) == 0) {
 			// Clone the substring before the delimiter.
-			ISize end = i;
+			U64 end = i;
 			S8 cloned = S8_sub(s, start, end, perm);
 			*sl_S8_push(&arr, perm) = cloned;
 			start = end + delimiter.len;
@@ -148,14 +157,14 @@ S8_split(S8 s, S8 delimiter, m_Allocator *perm)
 FUNCTION sl_S8
 S8_splitView(S8 s, S8 delimiter, m_Allocator *perm) {
 	sl_S8 arr = sl_S8_create(NIL, 0);
-	ISize start = 0;
-	for (ISize i = 0; i < s.len; i += 1) {
+	U64 start = 0;
+	for (U64 i = 0; i < s.len; i += 1) {
 		if (s.raw[i] != delimiter.raw[0]) {
 			continue;
 		}
 
 		if (m_memoryDifference(&s.raw[i], delimiter.raw, delimiter.len) == 0) {
-			ISize end = i;
+			U64 end = i;
 			S8 view = S8_view(s, start, end);
 			*sl_S8_push(&arr, perm) = view;
 			start = end + delimiter.len;
@@ -170,14 +179,14 @@ S8_splitView(S8 s, S8 delimiter, m_Allocator *perm) {
 
 FUNCTION S8
 S8_join(sl_S8 s, S8 join, m_Allocator *perm) {
-	ISize total_length = s.len * join.len;
-	for (ISize i = 0; i < s.len; i += 1) {
+	U64 total_length = s.len * join.len;
+	for (U64 i = 0; i < s.len; i += 1) {
 		total_length += s.elems[i].len;
 	}
 
 	U8 *mem = m_MAKE(U8, total_length + 1, perm);
-	ISize offset = 0;
-	for (ISize i = 0; i < s.len; i += 1) {
+	U64 offset = 0;
+	for (U64 i = 0; i < s.len; i += 1) {
 		m_memoryCopy(&mem[offset], s.elems[i].raw, s.elems[i].len);
 		offset += s.elems[i].len;
 
