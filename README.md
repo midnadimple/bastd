@@ -28,20 +28,16 @@ operations are included by default.
 - [x] Generic data-structures. The premier one is the
 [Dynamic Array](https://dylanfalconer.com/articles/dynamic-arrays-in-c), which
 brings the power of C++'s `std::vector` to C. 
-- [ ] A I/O system that supports both standard input/output and file
+- [x] A I/O system that supports both standard input/output and file
 input/output. It's built on a basic buffer type that you can flush to output
 data. This buffer type also acts as a **string builder**, by letting you append
 data to the buffer, then compile it to a string type.
-- [ ] A logging system built ontop of this I/O system. You can either log out to
-a file or to stdout.
-- [ ] A simple GUI initialization system that gets you an OpenGL window with
-immediate-mode input
-- [ ] A basic 2D renderer built ontop of this graphics initializater, that can
-draw shapes and textures to the screen. The shaders used can be customized for
-added effect. It features a simple camera system to seperate which parts of
-the screen use which shaders and viewports.
 - [ ] A multi-threaded job system. You can also just use the cross-platform
 primitives.
+- [ ] A Randomness API. Not really sure what else there is to say, really.
+- [ ] A 3D Math API with supports for Vectors and Matricies using SIMD.
+- [ ] A simple GUI initialization system that gets you a window with immediate-mode
+input and a Direct3D11 (Win32) / OpenGL (Linux) context to build a renderer with.
 - [ ] An audio library. Windows implementation uses WASAPI, Linux uses ALSA.
 
 ---
