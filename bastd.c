@@ -211,5 +211,7 @@ typedef U8 B8;
 #include "bastd/string.c"
 #include "bastd/buffer.c"
 #include "bastd/args.c"
+#include "bastd/job.c"
+#include "bastd/rand.c"
 
 #endif //BASTD_C

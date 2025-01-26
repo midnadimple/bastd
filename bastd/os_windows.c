@@ -2,10 +2,13 @@
 #define BASTD_OS_WINDOWS_C
 
 #include <windows.h>
+#include <intrin.h>
 #include <shellapi.h>
 #include <io.h>
 
 #define os_DEBUGBREAK() __debugbreak();
+#define os_WRITE_BARRIER _WriteBarrier()
+#define os_READ_BARRIER _ReadBarrier()
 
 FUNCTION void
 os_abort(char *msg)
@@ -21,7 +24,6 @@ os_alloc(U64 cap)
 {
 	return VirtualAlloc(NIL, cap, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 }
-
 
 FUNCTION B8
 os_write(int fd, U8 *buf, int len)
@@ -104,6 +106,84 @@ os_getArgcAndArgv(int *argc)
     argv[*argc] = NIL;
 
     return argv;
+}
+
+struct os_Thread {
+    HANDLE raw;
+};
+
+FUNCTION os_Thread
+os_Thread_start(os_ThreadProc proc, void *ctx)
+{
+    os_Thread res = {0};
+    res.raw = CreateThread(NIL, 0, proc, ctx, 0, NIL);
+    return res;
+}
+
+FUNCTION void
+os_Thread_detach(os_Thread *t)
+{
+    if (t->raw == NIL) return;
+    CloseHandle(t->raw);
+    t->raw = NIL;
+}
+
+FUNCTION void
+os_Thread_join(os_Thread *t)
+{
+    if (t->raw == NIL) return;
+    WaitForSingleObject(t->raw, INFINITE);
+    os_Thread_detach(t);
+}
+
+FUNCTION I64
+os_atomic_compareExchange64(I64 volatile *dst, I64 exchange, I64 compare)
+{
+    return InterlockedCompareExchange64(dst, exchange, compare);
+}
+
+FUNCTION I64
+os_atomic_increment64(I64 volatile *dst)
+{
+    return InterlockedIncrement64(dst);
+}
+
+FUNCTION I64
+os_atomic_decrement64(I64 volatile *dst)
+{
+    return InterlockedDecrement64(dst);
+}
+
+struct os_Semaphore {
+    HANDLE raw;
+};
+
+FUNCTION os_Semaphore
+os_Semaphore_create(I32 initial_count, I32 max_count)
+{
+    os_Semaphore res = {0};
+
+    res.raw = CreateSemaphoreExA(NIL, initial_count, max_count, NIL, 0, SEMAPHORE_ALL_ACCESS);
+    
+    return res;
+}
+
+FUNCTION B8
+os_Semaphore_increment(os_Semaphore semaphore, I32 count)
+{
+    return ReleaseSemaphore(semaphore.raw, count, NIL);
+}
+
+FUNCTION void
+os_Semaphore_wait(os_Semaphore semaphore)
+{
+    WaitForSingleObjectEx(semaphore.raw, INFINITE, FALSE);
+}
+
+FUNCTION U64
+os_rdtsc(void)
+{
+    return __rdtsc();
 }
 
 #if defined(BASTD_CLI)

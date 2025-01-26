@@ -32,9 +32,9 @@ brings the power of C++'s `std::vector` to C.
 input/output. It's built on a basic buffer type that you can flush to output
 data. This buffer type also acts as a **string builder**, by letting you append
 data to the buffer, then compile it to a string type.
-- [ ] A multi-threaded job system. You can also just use the cross-platform
+- [x] A multi-threaded job system. You can also just use the operating system's
 primitives.
-- [ ] A Randomness API. Not really sure what else there is to say, really.
+- [x] A Randomness API. Not really sure what else there is to say, really.
 - [ ] A 3D Math API with supports for Vectors and Matricies using SIMD.
 - [ ] A simple GUI initialization system that gets you a window with immediate-mode
 input and a Direct3D11 (Win32) / OpenGL (Linux) context to build a renderer with.

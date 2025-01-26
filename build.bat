@@ -10,6 +10,7 @@ REM cl ..\bastd\examples\memory.c %debugflags%
 REM cl ..\bastd\examples\fib_slice.c %debugflags%
 REM cl ..\bastd\examples\string.c %debugflags%
 REM cl ..\bastd\examples\buffer.c %debugflags%
+REM cl ..\bastd\examples\job_random.c %debugflags%
 
 REM This builds your application with debug symbols.
 cl ..\main.c %debugflags%
