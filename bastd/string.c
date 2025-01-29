@@ -203,4 +203,16 @@ S8_join(sl_S8 s, S8 join, m_Allocator *perm) {
 	return (S8){total_length, mem};
 }
 
+// Should probably get a better hashing func, but oh well
+FUNCTION U64
+S8_hash_prime19(S8 s)
+{
+	U64 h = 0x100;
+	for (U64 i = 0; i < s.len; i++) {
+		h ^= s.raw[i];
+		h *= 1111111111111111111u;
+	}
+	return h;
+}
+
 #endif//BASTD_STRING_C

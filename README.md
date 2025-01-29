@@ -27,7 +27,8 @@ of making the region of memory allocated to more explicit.
 operations are included by default.
 - [x] Generic data-structures. The premier one is the
 [Dynamic Array](https://dylanfalconer.com/articles/dynamic-arrays-in-c), which
-brings the power of C++'s `std::vector` to C. 
+brings the power of C++'s `std::vector` to C. There is also a HashMap, which is
+implemented as a [4-ary hash-trie](https://nullprogram.com/blog/2023/09/30/).
 - [x] A I/O system that supports both standard input/output and file
 input/output. It's built on a basic buffer type that you can flush to output
 data. This buffer type also acts as a **string builder**, by letting you append
@@ -38,6 +39,7 @@ primitives.
 - [ ] A 3D Math API with supports for Vectors and Matricies using SIMD.
 - [ ] A simple GUI initialization system that gets you a window with immediate-mode
 input and a Direct3D11 (Win32) / OpenGL (Linux) context to build a renderer with.
+- [ ] A simple immediate mode GUI with support for custom widgets.
 - [ ] An audio library. Windows implementation uses WASAPI, Linux uses ALSA.
 
 ---

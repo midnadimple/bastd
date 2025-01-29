@@ -352,6 +352,7 @@ m_Buddy_alloc(void *ctx, void *ptr, U64 old_size, U64 new_size) {
         if (found != NIL) {
             found->is_free = FALSE;
 			U8 *p = (U8 *)found + b->alignment;
+			m_memorySet(p, 0, new_size);
 			if (ptr != NIL) {
 				m_memoryCopy(p, ptr, old_size);
 			}
