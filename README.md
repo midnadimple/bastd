@@ -36,11 +36,14 @@ data to the buffer, then compile it to a string type.
 - [x] A multi-threaded job system. You can also just use the operating system's
 primitives.
 - [x] A Randomness API. Not really sure what else there is to say, really.
-- [ ] A 3D Math API with supports for Vectors and Matricies using SIMD.
 - [ ] A simple GUI initialization system that gets you a window with immediate-mode
-input and a Direct3D11 (Win32) / OpenGL (Linux) context to build a renderer with.
+input and a Direct3D11 (Win32) / OpenGL (Linux) context. The context given can
+either be given to a rendering library
+([`sokol_gfx.h`](https://github.com/floooh/sokol/blob/master/sokol_gfx.h) is 
+first-class) or you can raw-dog a renderer if you're feeling bold enough.
 - [ ] A simple immediate mode GUI with support for custom widgets.
 - [ ] An audio library. Windows implementation uses WASAPI, Linux uses ALSA.
+- [ ] A 3D Math API with supports for Vectors and Matricies using SIMD.
 
 ---
 - [x] implemented
