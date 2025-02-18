@@ -13,6 +13,6 @@ REM cl ..\bastd\examples\buffer.c %debugflags%
 REM cl ..\bastd\examples\job_random.c %debugflags%
 
 REM This builds your application with debug symbols.
-cl ..\main.c %debugflags%
+REM cl ..\main.c %debugflags%
 
 popd

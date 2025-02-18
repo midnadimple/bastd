@@ -24,10 +24,10 @@ rand_generateSeed(U64 x)
 FUNCTION U64
 rand_next(void)
 {
-	U64 rdtscp_val = os_rdtsc();
+	U64 wallclock = os_wallclock();
 	for (int i = 0; i < COUNT_OF(rand_seed); i++) {
 		if (rand_seed[i] == 0) {
-			rand_seed[i] = rand_generateSeed(rdtscp_val);
+			rand_seed[i] = rand_generateSeed(wallclock);
 		}
 	}
 

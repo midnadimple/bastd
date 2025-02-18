@@ -8,7 +8,7 @@ os_entry(void)
 	m_Allocator perm = m_BUDDY_ALLOCATOR(buddy);
 
 	Buffer buf = BUFFER(os_alloc(KILO(2)), KILO(2));
-	Buffer_appendS8(&buf, S8("Hello, Buffered output!"));
+	Buffer_appendS8(&buf, S8("Hello, Buffered output! "));
 	Buffer_appendI64(&buf, 10245);
 	S8 buf_built = Buffer_buildS8(&buf, &perm);
 

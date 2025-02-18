@@ -25,66 +25,83 @@ os_alloc(U64 cap)
 	return VirtualAlloc(NIL, cap, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 }
 
-FUNCTION B8
-os_write(int fd, U8 *buf, int len)
+struct os_File {
+    U8 *name;
+    HANDLE raw;
+    U64 size;
+    B8 already_exists;
+};
+
+FUNCTION os_File
+os_openFile(U8 *filename)
 {
-    HANDLE h = GetStdHandle(-10 - fd); 
-    if (h == INVALID_HANDLE_VALUE) {
-        h = (HANDLE)_get_osfhandle(fd);
+    os_File res = {0};
+    
+    res.name = filename;
+    
+    U32 attribs = GetFileAttributes(res.name);
+    res.already_exists = (attribs != INVALID_FILE_ATTRIBUTES &&
+        !(attribs & FILE_ATTRIBUTE_DIRECTORY));
+        
+    DWORD open_style = CREATE_NEW;
+    if (res.already_exists) {
+        open_style = OPEN_EXISTING;
     }
-    if (h == INVALID_HANDLE_VALUE) {
-        return FALSE;
-    }
-    U32 dummy;
-    return WriteFile(h, buf, len, &dummy, 0);
-}
-
-FUNCTION B8
-os_read(int fd, U8 *buf, int len, U32 *bytes_read)
-{
-    HANDLE h = GetStdHandle(-10 - fd); 
-    if (h != INVALID_HANDLE_VALUE) {
-        // This *should be* stdin
-        ASSERT(fd == 0, "fd is 0 for stdin");
-
-        B8 res = ReadConsole(h, buf, len, bytes_read, NIL);
-        return res;
-    } else {
-        h = (HANDLE)_get_osfhandle(fd);
-        return ReadFile(h, buf, len, bytes_read, 0);
-    }
-}
-
-FUNCTION U64
-os_getFileSize(int fd)
-{
-    HANDLE h = GetStdHandle(-10 - fd); 
-    if (h == INVALID_HANDLE_VALUE) {
-        // This is a real file
-        h = (HANDLE)_get_osfhandle(fd);
-    }
-
+    res.raw = CreateFileA(res.name, GENERIC_READ | GENERIC_WRITE,
+        FILE_SHARE_READ, 0, open_style, FILE_ATTRIBUTE_NORMAL, 0);
+            
     LARGE_INTEGER file_size;
-    GetFileSizeEx(h, &file_size);
-    return (U64)file_size.QuadPart;
+    GetFileSizeEx(res.raw, &file_size);
+    res.size = (U64)file_size.QuadPart;
+    
+    return res;
 }
 
-FUNCTION int
-os_openFile(U8 *filename, B8 always_create)
+FUNCTION os_File
+os_getStdout(void)
 {
-    U32 open_style = OPEN_EXISTING;
-    if (always_create) {
-        open_style = CREATE_ALWAYS;
-    }
-    HANDLE file = CreateFileA(filename, GENERIC_READ | GENERIC_WRITE,
-        FILE_SHARE_READ, 0, open_style, 0, 0);
-    return _open_osfhandle((intptr_t)file, 0);
+    os_File res = {0};
+    res.already_exists = TRUE;
+    res.name = "stdout";
+    res.size = KILO(1);
+    res.raw = GetStdHandle((U32)(-11));
+    return res;
+}
+
+FUNCTION os_File
+os_getStdin(void)
+{
+    os_File res = {0};
+    res.already_exists = TRUE;
+    res.name = "stdin";
+    res.size = KILO(1);
+    res.raw = GetStdHandle((U32)(-10));
+    return res;
+}
+        
+FUNCTION B8
+os_deleteFile(os_File file)
+{
+    return DeleteFileA(file.name);
 }
 
 FUNCTION B8
-os_closeFile(int fd)
+os_closeFile(os_File file)
 {
-    return _close(fd);
+    return CloseHandle(file.raw);
+}
+
+FUNCTION B8
+os_writeFile(os_File file, U8 *buf, int len)
+{
+    U32 dummy;
+    return WriteFile(file.raw, buf, len, &dummy, 0);
+}
+
+FUNCTION B8
+os_readFile(os_File file, U8 *buf, int len, U32 *bytes_read)
+{
+    return ReadFile(file.raw, buf, len, bytes_read, 0);
 }
 
 FUNCTION char **
@@ -181,9 +198,14 @@ os_Semaphore_wait(os_Semaphore semaphore)
 }
 
 FUNCTION U64
-os_rdtsc(void)
+os_wallclock(void)
 {
-    return __rdtsc();
+    LARGE_INTEGER count, freq;
+    QueryPerformanceFrequency(&freq);
+    QueryPerformanceCounter(&count);
+    
+    U64 res = (count.QuadPart * 1000000) / freq.QuadPart;
+    return res;
 }
 
 #if defined(BASTD_CLI)

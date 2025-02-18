@@ -11,68 +11,34 @@ struct Buffer {
 
 #define BUFFER(raw, cap) ((Buffer){raw, cap, 0, FALSE}) 
 
-typedef enum BufferOutputType BufferOutputType;
-enum BufferOutputType {
-	BufferOutputType_string = 0,
-	BufferOutputType_file,
-};
-
-typedef struct BufferOutput BufferOutput;
-struct BufferOutput {
-	BufferOutputType type;
-	union {
-		S8 str;
-		int fd;
-	} data;
-};
-
-FUNCTION void
-Buffer_flush(Buffer *b, BufferOutput out)
-{
-	switch (out.type) {
-	case BufferOutputType_string: {
-		b->error |= out.data.str.len < b->len;
-		m_memoryCopy(out.data.str.raw, b->raw, out.data.str.len);
-	} break;
-	case BufferOutputType_file: {
-		b->error |= out.data.fd < 0;
-		b->error |= !os_write(out.data.fd, b->raw, b->len);
-	} break;
-	}
-	b->len = 0;
-}
-
 // Utility
 FUNCTION S8
 Buffer_buildS8(Buffer *b, m_Allocator *perm)
 {
 	S8 res = S8_alloc(b->len, perm);
 
-	BufferOutput out = {0};
-	out.type = BufferOutputType_string;
-	out.data.str = res;
+	b->error |= res.len < b->len;
+	m_memoryCopy(res.raw, b->raw, res.len);
 
-	Buffer_flush(b, out);
+	b->len = 0;
 	return res;
 }
 
 FUNCTION void
 Buffer_standardOutput(Buffer *b)
 {
-	BufferOutput output = {0};
-	output.type = BufferOutputType_file;
-	output.data.fd = 1;
-	Buffer_flush(b, output);
+	os_File stdout = os_getStdout();
+	b->error |= !os_writeFile(stdout, b->raw, b->len);
+	b->len = 0;
 }
 
 FUNCTION void
 Buffer_fileOutput(Buffer *b, S8 filename)
 {
-	BufferOutput output = {0};
-	output.type = BufferOutputType_file;
-	output.data.fd = os_openFile(filename.raw, TRUE);
-	Buffer_flush(b, output);
-	os_closeFile(output.data.fd);
+	os_File file = os_openFile(filename.raw);
+	b->error |= !os_writeFile(file, b->raw, b->len);
+	os_closeFile(file);
+	b->len = 0;
 }
 
 FUNCTION void
@@ -112,6 +78,26 @@ Buffer_appendI64(Buffer *b, I64 x)
     if (x < 0) {
         *--beg = '-';
     }
+    Buffer_append(b, beg, end-beg);
+}
+
+FUNCTION void
+Buffer_appendU64Hex(Buffer *b, U64 x)
+{
+	U8 tmp[64];
+    U8 *end = tmp + sizeof(tmp);
+    U8 *beg = end;
+    do {
+		char remainder = x % 16;
+		char c = 0;
+		if (remainder > 9) {
+			c = remainder +55;
+		} else {
+			c = remainder + '0';
+		}
+        *--beg = c;
+    } while (x /= 16);
+	Buffer_appendS8(b, S8("0x"));
     Buffer_append(b, beg, end-beg);
 }
 
@@ -155,25 +141,26 @@ Buffer_appendF64(Buffer *b, F64 x, U64 num_decimals)
 FUNCTION void
 Buffer_appendFile(Buffer *b, S8 filename, m_Allocator *perm)
 {
-	int fd = os_openFile(filename.raw, FALSE);
-	U32 file_size = (U32)os_getFileSize(fd);
+	os_File file = os_openFile(filename.raw);
 
-	U8 *data = m_MAKE(U8, file_size, perm);
-	b->error |= os_read(fd, data, (int)file_size, &file_size);
-	Buffer_append(b, data, file_size);
+	U8 *data = m_MAKE(U8, file.size, perm);
+	b->error |= os_readFile(file, data, (int)file.size, &file.size);
+	Buffer_append(b, data, file.size);
 
-	os_closeFile(fd);
-	m_RELEASE(data, file_size, perm);
+	os_closeFile(file);
+	if (!file.already_exists) {
+		os_deleteFile(file);
+	}
+	m_RELEASE(data, file.size, perm);
 }
 
 FUNCTION void
 Buffer_appendStandardInput(Buffer *b, U64 max_read_size, m_Allocator *perm)
 {
-	int stdin_fd = 0;
-	U32 len = 0;
-
+	int len = 0;
 	U8 *data = m_MAKE(U8, max_read_size, perm);
-	b->error |= os_read(stdin_fd, data, (int)max_read_size, &len);
+	os_File stdin = os_getStdin();
+	b->error |= os_readFile(stdin, data, (int)max_read_size, &len);
 	Buffer_append(b, data, len);
 
 	// NOTE maybe we should switch to sl_U8 so theres no max length for stdin

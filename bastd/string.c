@@ -6,11 +6,10 @@ struct S8 {
 	U64 len;
 	U8 *raw;
 };
+#define S8(s) (S8){.len = LENGTH_OF(s), .raw = (U8 *)s}
 
 #define sl_TYPE S8
 #include "slice.c"
-
-#define S8(s) (S8){.len = LENGTH_OF(s), .raw = (U8 *)s}
 
 FUNCTION S8
 S8_alloc(U64 len, m_Allocator *perm)
@@ -105,6 +104,12 @@ S8_equal(S8 a, S8 b)
 		return FALSE;
 	}
 	return m_memoryDifference(a.raw, b.raw, a.len) == 0;
+}
+
+FUNCTION B8
+S8_empty(S8 s)
+{
+	return S8_equal(s, (S8){.len = 0, .raw = NIL});
 }
 
 FUNCTION S8

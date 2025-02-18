@@ -3,11 +3,19 @@
 
 FUNCTION void os_abort(char *msg);
 FUNCTION void *os_alloc(U64 cap);
-FUNCTION B8 os_write(int fd, U8 *buf, int len);
-FUNCTION B8 os_read(int fd, U8 *buf, int len, U32 *bytes_read);
-FUNCTION U64 os_getFileSize(int fd);
-FUNCTION int os_openFile(U8 *filename, B8 always_create);
-FUNCTION B8 os_closeFile(int fd);
+
+typedef struct os_File os_File;
+struct os_File; // Depends on the OS. Always tells you if the file existed before being opened
+
+FUNCTION os_File os_openFile(U8 *filename);
+FUNCTION os_File os_getStdout(void);
+FUNCTION os_File os_getStdin(void);
+
+FUNCTION B8 os_deleteFile(os_File file);
+FUNCTION B8 os_closeFile(os_File file);
+
+FUNCTION B8 os_readFile(os_File file, U8 *buf, int len, U32 *bytes_read);
+FUNCTION B8 os_writeFile(os_File file, U8 *buf, int len);
 
 typedef struct os_Thread os_Thread;
 struct os_Thread; // Depends on the OS
@@ -36,7 +44,8 @@ enum {
 };
 CALLBACK_EXPORT os_ErrorCode os_entry(void);
 
-FUNCTION U64 os_rdtsc(void);
+// Handle microseconds using U64
+FUNCTION U64 os_wallclock(void);
 
 #if defined(OS_WINDOWS)
 
