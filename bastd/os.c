@@ -37,6 +37,9 @@ FUNCTION os_Semaphore os_Semaphore_create(I32 initial_count, I32 max_count);
 FUNCTION B8 os_Semaphore_increment(os_Semaphore semaphore);
 FUNCTION void os_Semaphore_wait(os_Semaphore semaphore);
 
+// Handle microseconds using U64
+FUNCTION U64 os_wallclock(void);
+
 typedef int os_ErrorCode;
 enum {
 	os_ErrorCode_success = 0,
@@ -44,8 +47,6 @@ enum {
 };
 CALLBACK_EXPORT os_ErrorCode os_entry(void);
 
-// Handle microseconds using U64
-FUNCTION U64 os_wallclock(void);
 
 #if defined(OS_WINDOWS)
 
