@@ -13,19 +13,19 @@ os_entry(void)
 	sl_S8 str_list = sl_S8_create(init, 2);
 	S8 greeting = S8_join(str_list, S8(", "), &perm);
 	
-	Buffer_appendS8(&output, greeting);
-	Buffer_appendS8(&output, S8("!\n"));
+	Buffer_append_S8(&output, greeting);
+	Buffer_append_S8(&output, S8("!\n"));
 	Buffer_standardOutput(&output);
 
 	S8 hello = S8_sub(greeting, 0, 5, &perm);
-	Buffer_appendS8(&output, hello);
-	Buffer_appendS8(&output, S8("!\n"));
+	Buffer_append_S8(&output, hello);
+	Buffer_append_S8(&output, S8("!\n"));
 	Buffer_standardOutput(&output);
 
 	sl_S8 bye_bye = S8_split(S8("Goodbye! Sayonara! Ciao!"), S8(" "), &perm);
 	for (; bye_bye.len > 0;) {
-		Buffer_appendS8(&output, sl_S8_pop(&bye_bye));
-		Buffer_appendU8(&output, '\n');
+		Buffer_append_S8(&output, sl_S8_pop(&bye_bye));
+		Buffer_append_U8(&output, '\n');
 	}
 	Buffer_standardOutput(&output);
 

@@ -24,20 +24,15 @@ m_memoryCopy(void *dst, void *src, U64 n)
 	return dst;
 }
 
-FUNCTION U64
-m_memoryDifference(void *dst, void *src, U64 n)
+FUNCTION I64
+m_memoryDifference(void *s1, void *s2)
 {
-	U8 *s = (U8 *)src; 
-	U8 *d = (U8 *)dst; 
+    U8 *p1 = (U8 *)s1;
+    U8 *p2 = (U8 *)s2;
 
-	U64 count = 0;
-	for (U64 i = 0; i < n; i++) {
-		if (d[i] != s[i]) {
-			count++;
-		}
-	}
+    while (*p1 && *p1 == *p2) ++p1, ++p2;
 
-	return count;
+    return (*p1 > *p2) - (*p2  > *p1);
 }
 
 /* Alloc function taken from Lua.
@@ -155,7 +150,7 @@ m_Arena_setOffset(m_Arena *arena, m_ArenaOffset offset)
 typedef struct m_BuddyBlock m_BuddyBlock;
 struct m_BuddyBlock {
 	U64 size;
-	B8 is_free;
+	B32 is_free;
 };
 
 FUNCTION m_BuddyBlock *
@@ -294,7 +289,7 @@ m_Buddy_coalesce(m_BuddyBlock *head, m_BuddyBlock *tail) {
         m_BuddyBlock *block = head;   
         m_BuddyBlock *buddy = m_BuddyBlock_next(block);   
         
-        B8 no_coalescence = TRUE;
+        B32 no_coalescence = TRUE;
         while (block < tail && buddy < tail) { // make sure the buddies are within the range
             if (block->is_free && buddy->is_free && block->size == buddy->size) {
                 // Coalesce buddies into one

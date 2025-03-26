@@ -7,7 +7,6 @@
 #define sl_TYPE I64
 #include "../slice.c"
 
-
 // SLICE types
 FUNCTION void
 fib_slice(Buffer *output, m_Allocator *perm)
@@ -30,11 +29,57 @@ fib_slice(Buffer *output, m_Allocator *perm)
 		*sl_I64_push(&fib, perm) = a + b;
 	}
 
-	for (int i = 0; i < fib.len; i++) {
-		Buffer_appendI64(output, fib.elems[i]);
-		Buffer_appendU8(output, '\n');
+	Buffer_append_sl_I64(output, fib);
+	Buffer_append_U8(output, '\n');
+}
+
+FUNCTION void
+sort_slice(Buffer *output)
+{
+	m_Arena arena = m_Arena_create(os_alloc(GIGA(2)), GIGA(2));
+	m_Allocator scratch = m_ARENA_ALLOCATOR(arena);
+
+	sl_S8 foods = sl_S8_create(0, 0);
+	*sl_S8_push(&foods, &scratch) = S8("Pizza");
+	*sl_S8_push(&foods, &scratch) = S8("Biryani");
+	*sl_S8_push(&foods, &scratch) = S8("Rice");
+	*sl_S8_push(&foods, &scratch) = S8("Miso Soup");
+	*sl_S8_push(&foods, &scratch) = S8("Chicken Wings");
+
+	Buffer_append_S8(output, S8("Unsorted foods: "));
+	Buffer_append_sl_S8(output, foods);
+	Buffer_append_S8(output, S8("\n"));
+
+	// This is QuickSort
+	sl_S8_sort(&foods, 0, -1, sl_S8_compare);
+
+	Buffer_append_S8(output, S8("Sorted foods: "));
+	Buffer_append_sl_S8(output, foods);
+	Buffer_append_S8(output, S8("\n"));
+
+	// ----
+
+	// This is more of a stress test compared to previous examples which demonstrated the API
+	sl_I64 stress = sl_I64_create(0, 0);
+	for (int i = 0; i < 10; i++) {
+		*sl_I64_push(&stress, &scratch) = rand_next();
 	}
-	Buffer_standardOutput(output);
+
+	U64 start = os_wallclock();
+
+	sl_I64_sort(&stress, 0, -1, sl_I64_compare);
+	Buffer_append_S8(output, S8("Sorted: "));
+	Buffer_append_sl_I64(output, stress);
+	Buffer_append_S8(output, S8("\n"));
+
+	U64 end = os_wallclock();
+
+	I64 elapsed = end - start;
+	Buffer_append_S8(output, S8("sort_slice took "));
+	Buffer_append_F64(output, (F64)elapsed / 1000000, 4);
+	Buffer_append_S8(output, S8(" seconds to sort "));
+	Buffer_append_I64(output, stress.len);
+	Buffer_append_S8(output, S8(" numbers\n"));
 }
 
 /* These generic structures may have more than one required macro */
@@ -63,27 +108,30 @@ citypopulus_hashmap(Buffer *output, m_Allocator *perm)
 	U64 lahore_population = *hm_S8_U64_upsert(&database, S8("Lahore"), NIL);
 	U64 london_population = *hm_S8_U64_upsert(&database, S8("London"), NIL);
 	
-	Buffer_appendI64(output, dc_population);
-	Buffer_appendU8(output, '\n');
-	Buffer_appendI64(output, lahore_population);
-	Buffer_appendU8(output, '\n');
-	Buffer_appendI64(output, london_population);
-	Buffer_appendU8(output, '\n');
-
-	Buffer_standardOutput(output);
+	Buffer_append_I64(output, dc_population);
+	Buffer_append_U8(output, '\n');
+	Buffer_append_I64(output, lahore_population);
+	Buffer_append_U8(output, '\n');
+	Buffer_append_I64(output, london_population);
+	Buffer_append_U8(output, '\n');
 }
 
 CALLBACK_EXPORT os_ErrorCode
 os_entry(void)
 {
-	m_Buddy buddy = m_Buddy_create(os_alloc(MEGA(2)), MEGA(2));
+	m_Buddy buddy = m_Buddy_create(os_alloc(GIGA(2)), GIGA(2));
 	m_Allocator perm = m_BUDDY_ALLOCATOR(buddy);
 
 	Buffer output = BUFFER(m_MAKE(U8, KILO(2), &perm), KILO(2));
 
 	fib_slice(&output, &perm);
-	citypopulus_hashmap(&output, &perm);
+	Buffer_standardOutput(&output);
 
+	sort_slice(&output);
+	Buffer_standardOutput(&output);
+
+	citypopulus_hashmap(&output, &perm);
+	Buffer_standardOutput(&output);
 
 	return os_ErrorCode_success;
 }

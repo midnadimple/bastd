@@ -23,10 +23,10 @@ struct JobQueue {
 	os_Semaphore semaphore;
 };
 
-FUNCTION B8
+FUNCTION B32
 JobQueue__nextJob(JobQueue *queue)
 {
-	B8 done = FALSE;
+	B32 done = FALSE;
 	U64 next_read = queue->next_read;
 	U64 new_next_read = (next_read + 1) % MAX_NUM_JOBS;	
 

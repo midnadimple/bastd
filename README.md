@@ -36,10 +36,10 @@ data to the buffer, then compile it to a string type.
 - [x] A multi-threaded job system. You can also just use the operating system's
 primitives.
 - [x] A Randomness API. Not really sure what else there is to say, really.
-- [ ] Window Creation API with immediate-mode keyboard input and a configurable
-Vulkan context
-- [ ] A Vulkan-based Quad Batch Renderer.
-- [ ] An immediate mode GUI with support for custom widgets.
+- [x] Window Creation API with immediate-mode keyboard input and WebGPU surface.
+- [ ] An WebGPU-based Quad Batch Renderer.
+- [ ] An WebGPU-based Text Renderer.
+- [ ] An immediate mode GUI system built ontop of the Quad Batch Renderer.
 - [ ] An audio library. Windows implementation uses WASAPI, Linux uses ALSA.
 - [ ] A 3D Math API with supports for Vectors and Matricies using SIMD.
 

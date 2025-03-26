@@ -42,8 +42,8 @@ os_entry(void)
 	sl_S8 args = getArgsSlice(&buddy_allocator);
 
 	Buffer buf = BUFFER(os_alloc(KILO(2)), KILO(2));
-	Buffer_appendS8(&buf, S8("Trust me, this is cool\n"));
-	Buffer_appendS8(&buf, sl_S8_pop(&args)); // should print the last argument given to the command
+	Buffer_append_S8(&buf, S8("Trust me, this is cool\n"));
+	Buffer_append_S8(&buf, sl_S8_pop(&args)); // should print the last argument given to the command
 	Buffer_standardOutput(&buf);
 
 
@@ -54,7 +54,7 @@ os_entry(void)
 // 		frame_number += 1;
 
 // 		// if there is no module, function is styled "TypeName_functionName"
-// 		Buffer_appendS8(&stdout, "Current frame: ");
+// 		Buffer_append_S8(&stdout, "Current frame: ");
 // 		Buffer_appendI32(&stdout, frame_number);
 // 		Buffer_appendChar(&stdout, '\n');
 // 		Buffer_flush(&stdout);

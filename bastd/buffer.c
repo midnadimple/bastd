@@ -1,16 +1,6 @@
 #ifndef BASTD_BUFFER_C
 #define BASTD_BUFFER_C
 
-typedef struct Buffer Buffer;
-struct Buffer {
-	U8 *raw;
-	U64 cap;
-	U64 len;
-	B8 error;
-};
-
-#define BUFFER(raw, cap) ((Buffer){raw, cap, 0, FALSE}) 
-
 // Utility
 FUNCTION S8
 Buffer_buildS8(Buffer *b, m_Allocator *perm)
@@ -54,19 +44,19 @@ Buffer_append(Buffer *b, U8 *src, U64 len)
 }
 
 FUNCTION void
-Buffer_appendS8(Buffer *b, S8 s)
+Buffer_append_S8(Buffer *b, S8 s)
 {
 	Buffer_append(b, s.raw, s.len);
 }
 
 FUNCTION void
-Buffer_appendU8(Buffer *b, U8 c)
+Buffer_append_U8(Buffer *b, U8 c)
 {
 	Buffer_append(b, &c, 1);
 }
 
 FUNCTION void
-Buffer_appendI64(Buffer *b, I64 x)
+Buffer_append_I64(Buffer *b, I64 x)
 {
 	U8 tmp[64];
     U8 *end = tmp + sizeof(tmp);
@@ -82,7 +72,7 @@ Buffer_appendI64(Buffer *b, I64 x)
 }
 
 FUNCTION void
-Buffer_appendU64Hex(Buffer *b, U64 x)
+Buffer_append_U64Hex(Buffer *b, U64 x)
 {
 	U8 tmp[64];
     U8 *end = tmp + sizeof(tmp);
@@ -97,49 +87,49 @@ Buffer_appendU64Hex(Buffer *b, U64 x)
 		}
         *--beg = c;
     } while (x /= 16);
-	Buffer_appendS8(b, S8("0x"));
+	Buffer_append_S8(b, S8("0x"));
     Buffer_append(b, beg, end-beg);
 }
 
 FUNCTION void 
-Buffer_appendPtr(Buffer *b, void *p)
+Buffer_append_Ptr(Buffer *b, void *p)
 {
-    Buffer_appendS8(b, S8("0x"));
+    Buffer_append_S8(b, S8("0x"));
     UPtr u = (UPtr)p;
     for (U64 i = 2*sizeof(u) - 1; i >= 0; i--) {
-        Buffer_appendU8(b, "0123456789abcdef"[(u>>(4*i))&15]);
+        Buffer_append_U8(b, "0123456789abcdef"[(u>>(4*i))&15]);
     }
 }
 
 FUNCTION void
-Buffer_appendF64(Buffer *b, F64 x, U64 num_decimals)
+Buffer_append_F64(Buffer *b, F64 x, U64 num_decimals)
 {
 	F64 prec = 10 ^ num_decimals;
 
     if (x < 0) {
-        Buffer_appendU8(b, '-');
+        Buffer_append_U8(b, '-');
         x = -x;
     }
 
     x += 0.5 / prec;  // round last decimal
     if (x >= (F64)(-1UL>>1)) {  // out of I64 range?
-        Buffer_appendS8(b, S8("inf"));
+        Buffer_append_S8(b, S8("inf"));
     } else {
         I64 integral = (I64)x;
         I64 fractional = (x - integral)*prec;
-        Buffer_appendI64(b, integral);
-        Buffer_appendU8(b, '.');
+        Buffer_append_I64(b, integral);
+        Buffer_append_U8(b, '.');
         for (I64 i = prec/10; i > 1; i /= 10) {
             if (i > fractional) {
-                Buffer_appendU8(b, '0');
+                Buffer_append_U8(b, '0');
             }
         }
-        Buffer_appendI64(b, fractional);
+        Buffer_append_I64(b, fractional);
     }
 }
 
 FUNCTION void
-Buffer_appendFile(Buffer *b, S8 filename, m_Allocator *perm)
+Buffer_append_File(Buffer *b, S8 filename, m_Allocator *perm)
 {
 	os_File file = os_openFile(filename.raw);
 
@@ -155,7 +145,7 @@ Buffer_appendFile(Buffer *b, S8 filename, m_Allocator *perm)
 }
 
 FUNCTION void
-Buffer_appendStandardInput(Buffer *b, U64 max_read_size, m_Allocator *perm)
+Buffer_append_standardInput(Buffer *b, U64 max_read_size, m_Allocator *perm)
 {
 	int len = 0;
 	U8 *data = m_MAKE(U8, max_read_size, perm);

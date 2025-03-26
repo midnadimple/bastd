@@ -14,11 +14,11 @@ printJob(void *args)
 
 	U8 raw[256];
 	Buffer buf = BUFFER(raw, 256);
-	Buffer_appendS8(&buf, S8("Thread #"));
-	Buffer_appendI64(&buf, dtp->job_num);
-	Buffer_appendS8(&buf, S8(" | Random number is "));
-	Buffer_appendI64(&buf, dtp->random_num);
-	Buffer_appendU8(&buf, '\n');
+	Buffer_append_S8(&buf, S8("Thread #"));
+	Buffer_append_I64(&buf, dtp->job_num);
+	Buffer_append_S8(&buf, S8(" | Random number is "));
+	Buffer_append_I64(&buf, dtp->random_num);
+	Buffer_append_U8(&buf, '\n');
 	Buffer_standardOutput(&buf);
 }
 

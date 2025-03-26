@@ -173,7 +173,7 @@ typedef uintptr_t UPtr;
 typedef ptrdiff_t ISize;
 typedef size_t USize;
 
-typedef U8 B8;
+typedef U32 B32;
 #define TRUE 1
 #define FALSE 0
 
@@ -204,6 +204,27 @@ typedef U8 B8;
 #if !defined(BASTD_CLI) && !defined(BASTD_GUI)
 #error "BASTD_CLI or BASTD_GUI must be defined to set the approriate entry point
 #endif
+
+// Forward declaring these
+typedef struct Buffer Buffer;
+struct Buffer {
+	U8 *raw;
+	U64 cap;
+	U64 len;
+	B32 error;
+};
+
+#define BUFFER(raw, cap) ((Buffer){raw, cap, 0, FALSE}) 
+
+typedef struct S8 S8;
+struct S8 {
+	U64 len;
+	U8 *raw;
+};
+#define S8(s) (S8){.len = LENGTH_OF(s), .raw = (U8 *)s}
+
+FUNCTION void Buffer_append_U8(Buffer *b, U8 c);
+FUNCTION void Buffer_append_S8(Buffer *b, S8 s);
 
 // Includes
 #include "bastd/os.c"

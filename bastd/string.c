@@ -1,16 +1,6 @@
 #ifndef BASTD_STRING_C
 #define BASTD_STRING_C
 
-typedef struct S8 S8;
-struct S8 {
-	U64 len;
-	U8 *raw;
-};
-#define S8(s) (S8){.len = LENGTH_OF(s), .raw = (U8 *)s}
-
-#define sl_TYPE S8
-#include "slice.c"
-
 FUNCTION S8
 S8_alloc(U64 len, m_Allocator *perm)
 {
@@ -21,13 +11,10 @@ S8_alloc(U64 len, m_Allocator *perm)
 	return res;
 }
 
-FUNCTION ISize
+FUNCTION I64
 S8_difference(S8 s1, S8 s2)
 {
-	if (s1.len != s2.len) {
-		return SIZE_MAX;
-	}
-	return m_memoryDifference(s1.raw, s2.raw, s1.len);
+	return m_memoryDifference(s1.raw, s2.raw);
 }
 
 FUNCTION S8
@@ -51,10 +38,10 @@ S8_sub(S8 s, U64 start, U64 end, m_Allocator *perm)
 	return res;
 }
 
-FUNCTION B8
+FUNCTION B32
 S8_contains(S8 haystack, S8 needle)
 {
-	B8 found = FALSE;
+	B32 found = FALSE;
 	for (U64 i = 0, j = 0; i < haystack.len && !found; i++) {
 		while (haystack.raw[i] == needle.raw[j]) {
 			j += 1;
@@ -97,16 +84,16 @@ S8_subView(S8 haystack, S8 needle)
 	return r;
 }
 
-FUNCTION B8
+FUNCTION B32
 S8_equal(S8 a, S8 b)
 {
 	if (a.len != b.len) {
 		return FALSE;
 	}
-	return m_memoryDifference(a.raw, b.raw, a.len) == 0;
+	return m_memoryDifference(a.raw, b.raw) == 0;
 }
 
-FUNCTION B8
+FUNCTION B32
 S8_empty(S8 s)
 {
 	return S8_equal(s, (S8){.len = 0, .raw = NIL});
@@ -133,6 +120,9 @@ S8_clone(S8 s, m_Allocator *perm)
 	return r;
 }
 
+#define sl_TYPE S8
+#include "slice.c"
+
 FUNCTION sl_S8
 S8_split(S8 s, S8 delimiter, m_Allocator *perm)
 {
@@ -143,7 +133,7 @@ S8_split(S8 s, S8 delimiter, m_Allocator *perm)
 			continue;
 		}
 
-		if (m_memoryDifference(&s.raw[i], delimiter.raw, delimiter.len) == 0) {
+		if (m_memoryDifference(&s.raw[i], delimiter.raw) == 0) {
 			// Clone the substring before the delimiter.
 			U64 end = i;
 			S8 cloned = S8_sub(s, start, end, perm);
@@ -168,7 +158,7 @@ S8_splitView(S8 s, S8 delimiter, m_Allocator *perm) {
 			continue;
 		}
 
-		if (m_memoryDifference(&s.raw[i], delimiter.raw, delimiter.len) == 0) {
+		if (m_memoryDifference(&s.raw[i], delimiter.raw) == 0) {
 			U64 end = i;
 			S8 view = S8_view(s, start, end);
 			*sl_S8_push(&arr, perm) = view;
