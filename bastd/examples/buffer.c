@@ -20,7 +20,7 @@ os_entry(void)
 	Buffer_append_U8(&buf, '\n');
 	Buffer_fileOutput(&buf, S8("test.txt"));
 
-	Buffer_append_File(&buf, S8("test.txt"), &perm);
+	Buffer_append_File(&buf, S8("test.txt"), perm);
 	Buffer_append_S8(&buf, S8("We got this data from a file.\n"));
 	Buffer_standardOutput(&buf);
 

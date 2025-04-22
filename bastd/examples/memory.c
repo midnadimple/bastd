@@ -4,7 +4,7 @@
 CALLBACK_EXPORT os_ErrorCode
 os_entry(void)
 {
-	U64 buffer_size = KILO(2);
+	U32 buffer_size = KILO(2);
 
 	/* Arena allocator allocates new values at an incrementing offset, and can
 	   only free by resetting the beginning pointer to a previous offset

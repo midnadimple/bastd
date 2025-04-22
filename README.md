@@ -12,6 +12,15 @@ aims to be a sufficient and even superior replacement.
 - Giving clear errors and debugging tools to the Programmer
 - Making C a more "tolerable" language
 
+## Why C?
+Cuz I like C. It's the closest "high-level" language to assembly, so I have
+maximum control. It is *really simple*, which in some ways is to its detriment.
+Almost all OS libraries, Graphics libraries, Audio libraries, etc. are written
+in C.
+
+C is great. Don't let anyone tell you it's not.
+
+## Features
 `bastd`'s features include:
 - [x] **No header files.** They cause more harm than good in my opinion, and I
 prefer a single translation unit in my builds. You just include `bastd.c` at
@@ -51,13 +60,27 @@ primitives.
 The only currently supported platform is Windows, though once the APIs are
 finished, a Linux and FreeBSD port are planned.
 
-## Why C?
-Cuz I like C. It's the closest "high-level" language to assembly, so I have
-maximum control. It is *really simple*, which in some ways is to its detriment.
-Almost all OS libraries, Graphics libraries, Audio libraries, etc. are written
-in C.
+## Limitation(s)
+The only significant limitation I can think of that isn't a specific design
+choice is that the Quad Renderer only allows one texture to be allocated per
+batch. Why? Because WebGPU, despite being arguably the best GFX API out there,
+still sucks and doesn't support texture arrays.
 
-C is great. Don't let anyone tell you it's not.
+You load your texture at the start of the batch with `quad_Renderer_setTexture`,
+then when you are drawing texture quads, you have to specify texture coordinates
+in `quad_Renderer_pushQuadTextured`.
+
+This means that the optimal way to use the Quad Renderer is:
+1. If you are rendering a tileset, load a texture atlas and specify texture
+coordinates in `quad_Renderer_pushQuadTextured` to use all the sections of that
+image.
+2. If you are rendering a unique object, load their object sheet and do the same
+thing.
+3. If you are rendering different variants of the same object, you can probably
+collate them into the same atlas and switch rows.
+
+I would recommend using [this CLI tool](https://github.com/ansdor/atlas) to
+collate your images together.
 
 ## Examples
 You can change the build script to any of the examples. Once built, you should

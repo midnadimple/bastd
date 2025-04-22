@@ -65,14 +65,14 @@ sort_slice(Buffer *output)
 		*sl_I64_push(&stress, &scratch) = rand_next();
 	}
 
-	U64 start = os_wallclock();
+	U32 start = os_wallclock();
 
 	sl_I64_sort(&stress, 0, -1, sl_I64_compare);
 	Buffer_append_S8(output, S8("Sorted: "));
 	Buffer_append_sl_I64(output, stress);
 	Buffer_append_S8(output, S8("\n"));
 
-	U64 end = os_wallclock();
+	U32 end = os_wallclock();
 
 	I64 elapsed = end - start;
 	Buffer_append_S8(output, S8("sort_slice took "));
@@ -86,27 +86,27 @@ sort_slice(Buffer *output)
 #define hm_KEY_TYPE S8
 #define hm_KEY_HASHPROC S8_hash_prime19
 #define hm_KEY_EQUALSPROC S8_equal
-#define hm_VAL_TYPE U64
-#include "../hashmap.c" // will define hm_S8_U64
+#define hm_VAL_TYPE U32
+#include "../hashmap.c" // will define hm_S8_U32
 
 // HASHMAPS
 FUNCTION void
 citypopulus_hashmap(Buffer *output, m_Allocator *perm)
 {
 	// We always store a hashmap pointer, NOT the actual hashmap
-	hm_S8_U64 *database = hm_EMPTY;
+	hm_S8_U32 *database = hm_EMPTY;
 
-	*hm_S8_U64_upsert(&database, S8("London"), perm) = 8800000;
-	*hm_S8_U64_upsert(&database, S8("Lahore"), perm) = 13000000;
-	*hm_S8_U64_upsert(&database, S8("Dhaka"), perm) = 21280000;
-	*hm_S8_U64_upsert(&database, S8("Washington D.C."), perm) = 679000;
-	*hm_S8_U64_upsert(&database, S8("Taxila"), perm) = 739000;
+	*hm_S8_U32_upsert(&database, S8("London"), perm) = 8800000;
+	*hm_S8_U32_upsert(&database, S8("Lahore"), perm) = 13000000;
+	*hm_S8_U32_upsert(&database, S8("Dhaka"), perm) = 21280000;
+	*hm_S8_U32_upsert(&database, S8("Washington D.C."), perm) = 679000;
+	*hm_S8_U32_upsert(&database, S8("Taxila"), perm) = 739000;
 
 	// Can't iterate through hashmap, but in exchange, accessing values is fast
 	// NOTE: passing no allocator implies that you should NOT insert a value if it doesnt exist
-	U64 dc_population = *hm_S8_U64_upsert(&database, S8("Washington D.C."), NIL);
-	U64 lahore_population = *hm_S8_U64_upsert(&database, S8("Lahore"), NIL);
-	U64 london_population = *hm_S8_U64_upsert(&database, S8("London"), NIL);
+	U32 dc_population = *hm_S8_U32_upsert(&database, S8("Washington D.C."), NIL);
+	U32 lahore_population = *hm_S8_U32_upsert(&database, S8("Lahore"), NIL);
+	U32 london_population = *hm_S8_U32_upsert(&database, S8("London"), NIL);
 	
 	Buffer_append_I64(output, dc_population);
 	Buffer_append_U8(output, '\n');

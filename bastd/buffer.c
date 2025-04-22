@@ -129,11 +129,11 @@ Buffer_append_F64(Buffer *b, F64 x, U64 num_decimals)
 }
 
 FUNCTION void
-Buffer_append_File(Buffer *b, S8 filename, m_Allocator *perm)
+Buffer_append_File(Buffer *b, S8 filename, m_Allocator scratch)
 {
 	os_File file = os_openFile(filename.raw);
 
-	U8 *data = m_MAKE(U8, file.size, perm);
+	U8 *data = m_MAKE(U8, file.size, &scratch);
 	b->error |= os_readFile(file, data, (int)file.size, &file.size);
 	Buffer_append(b, data, file.size);
 
@@ -141,7 +141,7 @@ Buffer_append_File(Buffer *b, S8 filename, m_Allocator *perm)
 	if (!file.already_exists) {
 		os_deleteFile(file);
 	}
-	m_RELEASE(data, file.size, perm);
+	m_RELEASE(data, file.size, &scratch);
 }
 
 FUNCTION void

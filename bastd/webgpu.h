@@ -98,7 +98,7 @@
 #define WGPU_COPY_STRIDE_UNDEFINED UINT32_MAX
 #define WGPU_DEPTH_SLICE_UNDEFINED UINT32_MAX
 #define WGPU_LIMIT_U32_UNDEFINED UINT32_MAX
-#define WGPU_LIMIT_U64_UNDEFINED UINT64_MAX
+#define WGPU_LIMIT_U32_UNDEFINED UINT64_MAX
 #define WGPU_MIP_LEVEL_COUNT_UNDEFINED UINT32_MAX
 #define WGPU_QUERY_SET_INDEX_UNDEFINED UINT32_MAX
 #define WGPU_STRLEN SIZE_MAX
@@ -877,10 +877,10 @@ typedef enum WGPUTextureFormat {
     WGPUTextureFormat_BC6HRGBFloat = 0x00000037,
     WGPUTextureFormat_BC7RGBAUnorm = 0x00000038,
     WGPUTextureFormat_BC7RGBAUnormSrgb = 0x00000039,
-    WGPUTextureFormat_ETC2RGB32Unorm = 0x0000003A,
-    WGPUTextureFormat_ETC2RGB32UnormSrgb = 0x0000003B,
-    WGPUTextureFormat_ETC2RGB32A1Unorm = 0x0000003C,
-    WGPUTextureFormat_ETC2RGB32A1UnormSrgb = 0x0000003D,
+    WGPUTextureFormat_ETC2RGB8Unorm = 0x0000003A,
+    WGPUTextureFormat_ETC2RGB8UnormSrgb = 0x0000003B,
+    WGPUTextureFormat_ETC2RGB8A1Unorm = 0x0000003C,
+    WGPUTextureFormat_ETC2RGB8A1UnormSrgb = 0x0000003D,
     WGPUTextureFormat_ETC2RGBA8Unorm = 0x0000003E,
     WGPUTextureFormat_ETC2RGBA8UnormSrgb = 0x0000003F,
     WGPUTextureFormat_EACR11Unorm = 0x00000040,
@@ -3033,12 +3033,12 @@ typedef struct WGPULimits {
     /*.maxStorageBuffersPerShaderStage=*/WGPU_LIMIT_U32_UNDEFINED _wgpu_COMMA \
     /*.maxStorageTexturesPerShaderStage=*/WGPU_LIMIT_U32_UNDEFINED _wgpu_COMMA \
     /*.maxUniformBuffersPerShaderStage=*/WGPU_LIMIT_U32_UNDEFINED _wgpu_COMMA \
-    /*.maxUniformBufferBindingSize=*/WGPU_LIMIT_U64_UNDEFINED _wgpu_COMMA \
-    /*.maxStorageBufferBindingSize=*/WGPU_LIMIT_U64_UNDEFINED _wgpu_COMMA \
+    /*.maxUniformBufferBindingSize=*/WGPU_LIMIT_U32_UNDEFINED _wgpu_COMMA \
+    /*.maxStorageBufferBindingSize=*/WGPU_LIMIT_U32_UNDEFINED _wgpu_COMMA \
     /*.minUniformBufferOffsetAlignment=*/WGPU_LIMIT_U32_UNDEFINED _wgpu_COMMA \
     /*.minStorageBufferOffsetAlignment=*/WGPU_LIMIT_U32_UNDEFINED _wgpu_COMMA \
     /*.maxVertexBuffers=*/WGPU_LIMIT_U32_UNDEFINED _wgpu_COMMA \
-    /*.maxBufferSize=*/WGPU_LIMIT_U64_UNDEFINED _wgpu_COMMA \
+    /*.maxBufferSize=*/WGPU_LIMIT_U32_UNDEFINED _wgpu_COMMA \
     /*.maxVertexAttributes=*/WGPU_LIMIT_U32_UNDEFINED _wgpu_COMMA \
     /*.maxVertexBufferArrayStride=*/WGPU_LIMIT_U32_UNDEFINED _wgpu_COMMA \
     /*.maxInterStageShaderVariables=*/WGPU_LIMIT_U32_UNDEFINED _wgpu_COMMA \

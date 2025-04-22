@@ -47,6 +47,8 @@ FUNCTION void os_Semaphore_wait(os_Semaphore semaphore);
 // Handle microseconds using U64
 FUNCTION U64 os_wallclock(void);
 
+FUNCTION void os_debugPrint(S8 msg);
+
 #ifdef BASTD_GUI
 // windowing stuff
 
@@ -56,7 +58,7 @@ typedef struct os_Input os_Input;
 struct os_Input {
 	B32 key_down[os_Key_len];
 	B32 key_was_down[os_Key_len];
-	I32 mouse_x, mouse_y;
+	I32 mouse_x, mouse_y; // relative to top-left of screen
 	// TODO repeat event
 	// TODO gamepad
 };
@@ -84,6 +86,8 @@ struct os_Window {
 	S8 title;
 	U64 width;
 	U64 height;
+	U64 x; // leftmost
+	U64 y; // topmost
 	B32 resizeable;
 	void *raw; // Depends on the OS
 };
@@ -94,6 +98,8 @@ FUNCTION void os_Window_close(os_Window window);
 
 #include "webgpu.h"
 FUNCTION WGPUSurfaceDescriptor os_Window_getWGPUSurfaceDesc(os_Window window);
+
+FUNCTION void os_errorBoxGui(S8 msg);
 
 #endif
 

@@ -235,4 +235,9 @@ FUNCTION void Buffer_append_S8(Buffer *b, S8 s);
 #include "bastd/job.c"
 #include "bastd/rand.c"
 
+
+// Optional includes
+//#include "bastd/math.c"
+//#include "bastd/quad.c"
+
 #endif //BASTD_C

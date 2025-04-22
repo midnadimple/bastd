@@ -9,6 +9,7 @@
 #pragma comment (lib, "shell32")
 #pragma comment (lib, "gdi32")
 #pragma comment (lib, "user32")
+#pragma comment (lib, "webgpu_dawn")
 
 #define os_DEBUGBREAK() __debugbreak();
 #define os_WRITE_BARRIER _WriteBarrier()
@@ -201,6 +202,13 @@ os_wallclock(void)
     return res;
 }
 
+FUNCTION void
+os_debugPrint(S8 msg)
+{
+    msg.raw[msg.len - 1] = '\0';
+    OutputDebugStringA(msg.raw);
+}
+
 #if defined(BASTD_CLI)
 
 CALLBACK_EXPORT int
@@ -279,6 +287,18 @@ os_Window_create(S8 title, U64 width, U64 height, B32 resizeable)
 FUNCTION B32
 os_Window_update(os_Window *window, os_Input *input)
 {
+    RECT rect;
+    // get current size and pos for window client area
+    if (window->resizeable) {
+        GetClientRect(window->raw, &rect);
+        window->width = rect.right - rect.left;
+        window->height = rect.bottom - rect.top;
+    }
+
+    GetWindowRect(window->raw, &rect);
+    window->x = rect.left;
+    window->y = rect.top;
+    
     if (input) {
         for (U64 i = 0; i < os_Key_len; i++) {
             input->key_was_down[i] = input->key_down[i]; 
@@ -286,8 +306,11 @@ os_Window_update(os_Window *window, os_Input *input)
         
         POINT cursor;
         GetCursorPos(&cursor);
-        input->mouse_x = cursor.x;
-        input->mouse_y = cursor.y;
+        input->mouse_x = cursor.x - rect.left;
+        // have to do this to avoid the stupid title bars
+        int tb_height = (GetSystemMetrics(SM_CYFRAME) + GetSystemMetrics(SM_CYCAPTION) +
+        GetSystemMetrics(SM_CXPADDEDBORDER));
+        input->mouse_y = cursor.y - (rect.top + tb_height);
     }
 
     MSG msg;
@@ -335,14 +358,6 @@ os_Window_update(os_Window *window, os_Input *input)
         }
     }
 
-    // get current size for window client area
-    if (window->resizeable) {
-        RECT rect;
-        GetClientRect(window->raw, &rect);
-        window->width = rect.right - rect.left;
-        window->height = rect.bottom - rect.top;
-    }
-
     return TRUE;
 }
 
@@ -355,14 +370,21 @@ os_Window_close(os_Window window)
 FUNCTION WGPUSurfaceDescriptor
 os_Window_getWGPUSurfaceDesc(os_Window window)
 {
+    WGPUSurfaceSourceWindowsHWND *source = VirtualAlloc(0, sizeof(WGPUSurfaceSourceWindowsHWND), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+    source->chain.sType = WGPUSType_SurfaceSourceWindowsHWND;
+    source->hinstance = os_win32_priv.instance;
+    source->hwnd = window.raw;
     return (WGPUSurfaceDescriptor){
-        .nextInChain = &((WGPUSurfaceSourceWindowsHWND)
-        {
-            .chain.sType = WGPUSType_SurfaceSourceWindowsHWND,
-            .hinstance = os_win32_priv.instance,
-            .hwnd = window.raw,
-        }).chain,
+        .nextInChain = &source->chain,
     };
+}
+
+FUNCTION void
+os_errorBoxGui(S8 msg)
+{
+    msg.raw[msg.len] = '\0';
+    MessageBoxA(NIL, msg.raw, "bastd - Error", MB_ICONEXCLAMATION);
+    ExitProcess(0);
 }
 
 CALLBACK_EXPORT int
