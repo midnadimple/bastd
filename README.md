@@ -2,6 +2,22 @@
 
 Version 3. I still like C. (bars)
 
+# Usage
+
+Clone this a subdirectory in your project, then include:
+
+```c
+#include "bastd/lib.h"
+```
+
+If you are doing a unity build:
+
+```c
+#include "bastd/lib.c"
+```
+
+...else compile `bastd/lib.c` as a seperate translation unit.
+
 # LICENSE
 
 This is free and unencumbered software released into the public domain.
