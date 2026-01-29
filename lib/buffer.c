@@ -110,9 +110,9 @@ Buffer_flush(Buffer *b)
 	if (!b->error && b->len) {
 		str = Buffer_buildS8(b, scratch.arena);
 		b->error |= !os_File_write(b->file, str, -1);
-		b->len = 0;
 	}
 
+	b->len = 0;
 	mem_ArenaTemp_end(scratch);
 }
 
