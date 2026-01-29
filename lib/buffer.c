@@ -109,7 +109,7 @@ Buffer_flush(Buffer *b)
 	b->error |= b->file.raw == NIL;
 	if (!b->error && b->len) {
 		str = Buffer_buildS8(b, scratch.arena);
-		b->error |= !os_File_write(b->file, str, 0);
+		b->error |= !os_File_write(b->file, str, -1);
 		b->len = 0;
 	}
 
