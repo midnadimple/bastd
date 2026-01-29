@@ -273,6 +273,7 @@ void os_File_close(os_File file);
  * if end_offset < 0, will read until the end of the file
  */
 S8 os_File_read(os_File file, mem_Arena *arena, ISize start_offset, ISize end_offset);
+/* if offset < 0, will write to end of file */
 B32 os_File_write(os_File file, S8 str, ISize offset);
 
 ISize os_getPageSize(void);

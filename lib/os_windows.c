@@ -52,10 +52,10 @@ os_File_write(os_File file, S8 str, ISize offset)
 	DWORD dummy;
 	B32 res;
 
-	if (offset > 0) {
-		SetFilePointer((HANDLE)file.raw, (long)offset, NULL, FILE_BEGIN);
+	if (offset < 0) {
+		SetFilePointer((HANDLE)file.raw, 0, NULL, FILE_END);
 	} else {
-		SetFilePointer((HANDLE)file.raw, 0, NULL, FILE_BEGIN);
+		SetFilePointer((HANDLE)file.raw, (long)offset, NULL, FILE_BEGIN);
 	}
 
 	res = WriteFile((HANDLE)file.raw, str.data, (I32)str.len, &dummy, 0);
