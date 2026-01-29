@@ -37,10 +37,6 @@ tctx_getScratchArena(mem_Arena **conflicts, ISize num_conflicts)
 void
 tctx_logAppendFileLine(ISize line, S8 filename, tctx_MsgKind kind, S8 fmt, ...)
 {
-	if (kind == tctx_MsgDebug && !DEBUG_BUILD) {
-		return;
-	}
-
 	Buffer buf = Buffer(mem_make(tctx.log_arena, U8, 2048), 2048);
 	tctx_Msg *msg = mem_Slice_push(&tctx.log_msg_list, tctx.log_arena);
 	va_list args;
@@ -63,6 +59,11 @@ tctx_logOutputToConsole(void)
 
 	for (i = 0; i < tctx.log_msg_list.len; i++) {
 		msg = tctx.log_msg_list.data[i];
+
+		if (msg.kind == tctx_MsgDebug && !DEBUG_BUILD) {
+			continue;
+		}
+
 		switch (msg.kind) {
 		case tctx_MsgInfo:
 			printError(S8("INFO / "));
@@ -73,9 +74,7 @@ tctx_logOutputToConsole(void)
 		case tctx_MsgError:
 			printError(S8("ERROR / "));
 			break;
-		case tctx_MsgDebug:
-			printError(S8("DEBUG / "));
-			break;
+		default: break;
 		}
 
 		#ifdef DEBUG_BUILD
