@@ -77,12 +77,11 @@ tctx_logOutputToConsole(void)
 		default: break;
 		}
 
-		#if DEBUG_BUILD
-		printError(S8("%s / Line %d: %s\n"), msg.filename, (I64)msg.line, msg.msg);
-		#else
-		printError(S8("%s\n"), msg.msg);
-		#endif
-
+		if (!DEBUG_BUILD) {
+			printError(S8("%s / Line %d: %s\n"), msg.filename, (I64)msg.line, msg.msg);
+		} else {
+			printError(S8("%s\n"), msg.msg);
+		}
 	}
 
 	mem_Arena_clear(tctx.log_arena);
