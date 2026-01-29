@@ -31,8 +31,11 @@ typedef size_t    USize;
 
 #if defined(_MSC_VER)
 #define debugBreak() __debugbreak()
+#define isDebuggerPresent() IsDebuggerPresent()
 #elif defined(__GNUC__) || defined(__clang__)
 #define debugBreak() __builtin_unreachable()
+/* checking this is more annoying than it should be so im leaving it for now */
+#define isDebuggerPresent()
 #else
 #error "debugBreak undefined for current compiler"
 #endif
