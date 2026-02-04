@@ -1,3 +1,4 @@
+#define __BitSet_WORD_BITS (8 * sizeof(unsigned int))
 
 void
 BitSet_setIdx(BitSet *ba, ISize idx, mem_Arena *a)
@@ -13,7 +14,10 @@ BitSet_setIdx(BitSet *ba, ISize idx, mem_Arena *a)
 	}
 
 	if (starting_size < idx + 1) {
-		extend_size = (idx + 1 - starting_size) / 8 + 1;
+		/* extend size in bits is (idx + 1 - starting size) */
+		/* then to put this in bytes, take away 1, add word size and divide by word size */
+		
+		extend_size = (idx - starting_size + __BitSet_WORD_BITS) / __BitSet_WORD_BITS;
 
 		tctx_logAppend(tctx_MsgDebug, S8("Extending BitSet (pointer %p, length %d) by %d bytes"), idx, ba, ba->len, extend_size);
 
@@ -26,11 +30,9 @@ BitSet_setIdx(BitSet *ba, ISize idx, mem_Arena *a)
 			mem_Slice_push(ba, a);
 		} 
 	}
-	
-	#define __BitSet_WORD_BITS (8 * sizeof(unsigned int))
-	
+		
 	ba->data[idx / __BitSet_WORD_BITS] |= (1 << (idx & (__BitSet_WORD_BITS - 1)));
 	
-	#undef __BitSet_WORD_BITS
 }
 
+#undef __BitSet_WORD_BITS
