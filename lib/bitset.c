@@ -12,6 +12,10 @@ BitSet_alloc(mem_Arena *a, ISize len)
 void
 BitSet_setIdx(BitSet *ba, ISize idx)
 {
+	if (res->ba == NIL) {
+		tctx_logAppend(tctx_MsgError, S8("Failed to set index %d on NIL BitSet"), idx);
+		return;
+	}
 	res->ba[idx / __BitSet_WORD_BITS] |= (1 << (idx & (__BitSet_WORD_BITS - 1)));
 }
 
