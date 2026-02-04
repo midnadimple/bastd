@@ -44,4 +44,14 @@ BitSet_getIdx(BitSet *ba, ISize idx)
 	return (B32)(ba->data[idx / __BitSet_WORD_BITS] & (1 << (idx & (__BitSet_WORD_BITS - 1))));
 }
 
+void
+BitSet_clearIdx(BitSet *ba, ISize idx)
+{
+	if (ba == NIL || ba->data == NIL || ba->len <= 0) {
+		return;
+	}
+
+	ba->data[idx / __BitSet_WORD_BITS] &= ~(1 << (idx & (__BitSet_WORD_BITS - 1)));
+}
+
 #undef __BitSet_WORD_BITS
