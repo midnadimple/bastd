@@ -4,7 +4,6 @@ S8_alloc(ISize len, mem_Arena *a)
 	S8 s = {0};
 	s.len = len;
 	s.data = mem_make(a, U8, len + 1);
-	s.data[len] = 0; // Null terminator
 	return s;
 }
 
@@ -72,8 +71,9 @@ S8_replace(S8 haystack, S8 needle, S8 replacement, mem_Arena *a)
     }
 
     replaceable = S8_count(haystack, needle);
-    if (replaceable == 0)
+    if (replaceable == 0) {
         return haystack;
+    }
 
     new_len = (haystack.len - replaceable * needle.len) + (replaceable * replacement.len);
     res = S8_alloc(new_len, a);
@@ -135,13 +135,15 @@ S8_find(S8 haystack, S8 needle, ISize offset)
                 if ((haystack.len - i) >= needle.len) {
                     sub.data = haystack.data + i;
                     sub.len = needle.len;
-                    if (S8_eq(sub, needle))
+                    if (S8_eq(sub, needle)) {
                         break;
+                    }
                 }
             }
         } 
-        if (i == one_past_last)
+        if (i == one_past_last) {
             i = -1;
+        }
     }
 
     return i;
@@ -243,7 +245,7 @@ S8_parseI64(S8 num_str)
 	U8 *c = num_str.data;
 
 	if (S8_isNil(num_str)) {
-		tctx_logAppend(tctx_MsgError, S8("Nil string given"));
+		tctx_logAppend(tctx_MsgDebug, S8("Failed to parse NIL string"));
 		return 0;
 	}
 
@@ -254,7 +256,7 @@ S8_parseI64(S8 num_str)
 
 	while (c < num_str.data + num_str.len) {
 		if (*c < '0' || *c > '9') {
-			tctx_logAppend(tctx_MsgError, S8("Non-digit character '%c' found"), *c);
+			tctx_logAppend(tctx_MsgError, S8("Non-digit character '%c' found while parsing string `%s`"), *c, num_str);
 			return 0;
 		}
 		result *= 10;

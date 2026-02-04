@@ -86,7 +86,7 @@ mem_Arena_create(ISize reserve_size, ISize commit_size)
     commit_size = __mem_AlignUpPow2(commit_size, page_size);
 
     arena = os_memReserve(reserve_size);
-    assert(os_memCommit(arena, commit_size));
+    os_memCommit(arena, commit_size);
 
     arena->reserve_size = reserve_size;
     arena->commit_size = commit_size;
@@ -113,13 +113,17 @@ mem_Arena_push(mem_Arena *a, ISize size)
     ISize new_commit_size;
     U8 *out;
 
-    assert(a != NIL);
+    if (a == NIL) {
+        tctx_logAppend(tctx_MsgDebug, S8("Failed to allocate in a NIL arena."));
+        return NIL;
+    }
 
     pos_aligned = __mem_AlignUpPow2(a->pos, __mem_Arena_ALIGN);
     new_pos = pos_aligned + size;
 
     if (new_pos > a->reserve_size) {
         /* out of memory */
+        tctx_logAppend(tctx_MsgError, S8("Out of memory in Arena (pointer %p)."), a);
         return NIL;
     }
 
@@ -132,9 +136,7 @@ mem_Arena_push(mem_Arena *a, ISize size)
 
         out = (U8 *)a + a->commit_pos;
         new_commit_size = new_commit_pos - a->commit_pos;
-        if (!os_memCommit(out, new_commit_size)) {
-            return NIL;
-        }
+        os_memCommit(out, new_commit_size);
 
         a->commit_pos = new_commit_pos;
     }
@@ -149,6 +151,10 @@ mem_Arena_push(mem_Arena *a, ISize size)
 void
 mem_Arena_pop(mem_Arena *a, ISize size)
 {
+    if (a == NIL) {
+        tctx_logAppend(tctx_MsgDebug, S8("passed a NIL arena."));
+        return;
+    }
     size = min(size, a->pos - __mem_Arena_BASE_POS);
     a->pos -= size;
 }

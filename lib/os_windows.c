@@ -2,6 +2,15 @@
 
 #pragma comment(lib, "user32.lib")
 
+static S8
+__win32_GetLastErrorS8(mem_Arena *a)
+{
+	S8 res = {0}
+	res = S8_alloc(256, a);
+	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), 0, res.data, 1024, NULL);
+	return res;
+}
+
 os_File 
 os_File_open(S8 filename, os_FileOpenMode mode)
 {
@@ -9,6 +18,9 @@ os_File_open(S8 filename, os_FileOpenMode mode)
 	U32 attribs = GetFileAttributes((LPCSTR)filename.data);
 	U32 open_style = 0;
 	LARGE_INTEGER file_size = {0};
+	mem_ArenaTemp scratch;
+
+	scratch = tctx_getScratchArena(0, NIL);
 
 	res.name = filename;
 	res.already_exists = attribs != INVALID_FILE_ATTRIBUTES && !(attribs & FILE_ATTRIBUTE_DIRECTORY);
@@ -27,6 +39,11 @@ os_File_open(S8 filename, os_FileOpenMode mode)
 	
 	res.raw = (void*)CreateFileA((LPCSTR)filename.data, GENERIC_READ | GENERIC_WRITE,
 		FILE_SHARE_READ, 0, open_style, FILE_ATTRIBUTE_NORMAL, 0);
+
+	if (res.raw == NIL) {
+		tctx_logAppend(tctx_MsgError, S8("Failed to open file `%s`. Win32 Error: %s"), filename, __win32_GetLastErrorS8(scratch.arena));
+		return (os_File){0};
+	}
 
 	GetFileSizeEx(res.raw, &file_size);
 	res.size = (ISize)file_size.QuadPart;
@@ -146,12 +163,10 @@ os_exit(U32 err_code)
 	ExitProcess(err_code);
 }
 
-
 /* TODO CRT free */
 int
 main(int argc, char **argv)
 {
-
 	mem_Arena *arg_arena = mem_Arena_create(MiB(1), KiB(64));
 	S8Slice args = {0};
 	os_File stdfile = {0};

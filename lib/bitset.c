@@ -1,27 +1,36 @@
-#define __BitSet_WORD_BITS (8 * sizeof(unsigned int))
-
-BitSet
-BitSet_alloc(mem_Arena *a, ISize len)
-{
-	BitSet res = {0};
-	ISize alloc_size = (len + __BitSet_WORD_BITS - 1) / __BitSet_WORD_BITS;
-	res.len = len;
-	res.ba = mem_make(a, unsigned int, alloc_size);
-	return res;
-}
 
 void
-BitSet_setIdx(BitSet *ba, ISize idx)
+BitSet_setIdx(BitSet *ba, ISize idx, mem_Arena *a)
 {
-	if (res->ba == NIL) {
-		tctx_logAppend(tctx_MsgError, S8("Failed to set index %d on NIL BitSet"), idx);
-		return;
+	ISize extend_size = 0;
+	ISize starting_size = 0;
+	int i;
+
+	if (ba == NIL) {
+		tctx_logAppend(tctx_MsgDebug, S8("Allocating NIL Bitset (%p)"), ba);
+	} else {
+		starting_size = ba->len;
 	}
 
-	if (res->len < idx + 1) {
-		tctx_logAppend(tctx_MsgError, S8("Failed to set index %d on BitSet with length %d"), idx, res->len);
+	if (starting_size < idx + 1) {
+		extend_size = (idx + 1 - starting_size) / 8 + 1;
+
+		tctx_logAppend(tctx_MsgDebug, S8("Extending BitSet (pointer %p, length %d) by %d bytes"), idx, ba, ba->len, extend_size);
+
+		if (a == NIL) {
+			tctx_logAppend(tctx_MsgDebug, S8("No arena given for extending Bitset (pointer %p, length %d). Doing nothing"), ba, ba->len);
+			return;
+		}
+
+		for (i = 0; i < extend_size; i++) {
+			mem_Slice_push(ba, a);
+		} 
 	}
-	res->ba[idx / __BitSet_WORD_BITS] |= (1 << (idx & (__BitSet_WORD_BITS - 1)));
+	
+	#define __BitSet_WORD_BITS (8 * sizeof(unsigned int))
+	
+	ba->data[idx / __BitSet_WORD_BITS] |= (1 << (idx & (__BitSet_WORD_BITS - 1)));
+	
+	#undef __BitSet_WORD_BITS
 }
 
-#undef __BitSet_WORD_BITS

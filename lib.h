@@ -253,14 +253,9 @@ U64 S8_hash64(S8 s);
 
 /* BITSET */
 
-typedef struct BitSet BitSet;
-struct BitSet {
-	/* we're using the native int size for the bitarray */
-	unsigned int *ba;
+/* we're using the native int size for the bitarray */
+typedef mem_Slice_TYPE(unsigned int) BitSet;
 
-	ISize len;
-};
-BitSet BitSet_alloc(mem_Arena *a, ISize len);
 void BitSet_setIdx(BitSet *ba, ISize idx);
 
 /* MATH */
