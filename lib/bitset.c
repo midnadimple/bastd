@@ -7,7 +7,7 @@ BitSet_setIdx(BitSet *ba, ISize idx, mem_Arena *a)
 	ISize starting_size = 0;
 	int i;
 
-	if (ba == NIL) {
+	if (ba == NIL || ba->data == NIL) {
 		tctx_logAppend(tctx_MsgDebug, S8("Allocating NIL Bitset (%p)"), ba);
 	} else {
 		starting_size = ba->len;
@@ -33,6 +33,15 @@ BitSet_setIdx(BitSet *ba, ISize idx, mem_Arena *a)
 		
 	ba->data[idx / __BitSet_WORD_BITS] |= (1 << (idx & (__BitSet_WORD_BITS - 1)));
 	
+}
+
+B32
+BitSet_getIdx(BitSet *ba, ISize idx)
+{
+	if (ba == NIL || ba->data == NIL || ba->len <= 0) {
+		return FALSE;
+	}
+	return (B32)(ba->data[idx / __BitSet_WORD_BITS] & (1 << (idx & (__BitSet_WORD_BITS - 1))));
 }
 
 #undef __BitSet_WORD_BITS
