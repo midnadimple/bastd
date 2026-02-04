@@ -18,6 +18,11 @@ If you are doing a unity build:
 
 ...else compile `bastd/lib.c` as a seperate translation unit.
 
+# TODO
+- [ ] Documentation
+- [ ] Linear Algebra
+- [ ] Support [Multi-Core by Default](https://www.rfleury.com/p/multi-core-by-default)
+
 # LICENSE
 
 This is free and unencumbered software released into the public domain.

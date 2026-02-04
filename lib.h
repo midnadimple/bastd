@@ -261,6 +261,11 @@ struct BitSet {
 BitSet BitSet_alloc(mem_Arena *a, ISize len);
 void BitSet_setIdx(BitSet *ba, ISize idx);
 
+/* MATH */
+
+/* Get a random number. The seed is modified each time the function is called */
+U32 math_rand(U64 *seed);
+
 /* OS functions */
 
 typedef struct os_File os_File;
@@ -288,6 +293,8 @@ void os_File_close(os_File file);
 S8 os_File_read(os_File file, mem_Arena *arena, ISize start_offset, ISize end_offset);
 /* if offset < 0, will write to end of file */
 B32 os_File_write(os_File file, S8 str, ISize offset);
+
+U64 os_wallclock(void);
 
 ISize os_getPageSize(void);
 void *os_memReserve(ISize size);

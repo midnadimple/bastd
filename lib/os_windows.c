@@ -93,6 +93,19 @@ os_File_read(os_File file, mem_Arena *arena, ISize start_offset, ISize end_offse
 	return res;
 }
 
+U64
+os_wallclock(void)
+{
+	LARGE_INTEGER count, freq;
+	U64 res = 0;
+    
+    QueryPerformanceFrequency(&freq);
+    QueryPerformanceCounter(&count);
+    
+    res = (count.QuadPart * 1000000) / freq.QuadPart;
+    return res;
+}
+
 ISize
 os_getPageSize(void)
 {
