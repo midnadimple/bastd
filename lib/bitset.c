@@ -5,6 +5,7 @@ BitSet_alloc(mem_Arena *a, ISize len)
 {
 	BitSet res = {0};
 	ISize alloc_size = (len + __BitSet_WORD_BITS - 1) / __BitSet_WORD_BITS;
+	res.len = len;
 	res.ba = mem_make(a, unsigned int, alloc_size);
 	return res;
 }
@@ -15,6 +16,10 @@ BitSet_setIdx(BitSet *ba, ISize idx)
 	if (res->ba == NIL) {
 		tctx_logAppend(tctx_MsgError, S8("Failed to set index %d on NIL BitSet"), idx);
 		return;
+	}
+
+	if (res->len < idx + 1) {
+		tctx_logAppend(tctx_MsgError, S8("Failed to set index %d on BitSet with length %d"), idx, res->len);
 	}
 	res->ba[idx / __BitSet_WORD_BITS] |= (1 << (idx & (__BitSet_WORD_BITS - 1)));
 }

@@ -257,6 +257,8 @@ typedef struct BitSet BitSet;
 struct BitSet {
 	/* we're using the native int size for the bitarray */
 	unsigned int *ba;
+
+	ISize len;
 };
 BitSet BitSet_alloc(mem_Arena *a, ISize len);
 void BitSet_setIdx(BitSet *ba, ISize idx);
