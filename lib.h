@@ -251,6 +251,16 @@ U32 S8_hash32(S8 s);
 /* Returns an unsigned 64-bit hash of the given string */
 U64 S8_hash64(S8 s);
 
+/* BITSET */
+
+typedef struct BitSet BitSet;
+struct BitSet {
+	/* we're using the native int size for the bitarray */
+	unsigned int *ba;
+};
+BitSet BitSet_alloc(mem_Arena *a, ISize len);
+void BitSet_setIdx(BitSet *ba, ISize idx);
+
 /* OS functions */
 
 typedef struct os_File os_File;

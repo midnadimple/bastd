@@ -2,6 +2,7 @@
 
 #include "lib/mem.c"
 #include "lib/string.c"
+#include "lib/bitset.c"
 #include "lib/buffer.c"
 #include "lib/thread.c"
 
