@@ -36,12 +36,12 @@ BitSet_setIdx(BitSet *ba, ISize idx, mem_Arena *a)
 }
 
 B32
-BitSet_getIdx(BitSet *ba, ISize idx)
+BitSet_getIdx(BitSet ba, ISize idx)
 {
-	if (ba == NIL || ba->data == NIL || ba->len <= 0) {
+	if (ba->data == NIL || ba.len <= 0) {
 		return FALSE;
 	}
-	return (B32)(ba->data[idx / __BitSet_WORD_BITS] & (1 << (idx & (__BitSet_WORD_BITS - 1))));
+	return (B32)(ba.data[idx / __BitSet_WORD_BITS] & (1 << (idx & (__BitSet_WORD_BITS - 1))));
 }
 
 void

@@ -257,8 +257,8 @@ U64 S8_hash64(S8 s);
 typedef mem_Slice_TYPE(unsigned int) BitSet;
 
 void BitSet_setIdx(BitSet *ba, ISize idx, mem_Arena *a);
-B32 BitSet_getIdx(BitSet *ba, ISize idx);
 void BitSet_clearIdx(BitSet *ba, ISize idx);
+B32 BitSet_getIdx(BitSet ba, ISize idx);
 
 /* MATH */
 
