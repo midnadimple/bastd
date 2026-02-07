@@ -5,9 +5,9 @@
 static S8
 __win32_GetLastErrorS8(mem_Arena *a)
 {
-	S8 res = {0}
+	S8 res = {0};
 	res = S8_alloc(256, a);
-	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), 0, res.data, 1024, NULL);
+	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError(), 0, (LPSTR)res.data, 1024, NULL);
 	return res;
 }
 
