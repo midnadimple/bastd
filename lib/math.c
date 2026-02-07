@@ -8,7 +8,7 @@ math_rand(U64 *seed)
 
     old = *seed ^ 0xc90fdaa2adf85459ULL;
     *seed = *seed * 6364136223846793005ULL + 0xc90fdaa2adf85459ULL;
-    U32 xorshifted = ((old >> 18u) ^ old) >> 27u;
-    U32 rot = old >> 59u;
+    xorshifted = ((old >> 18u) ^ old) >> 27u;
+    rot = old >> 59u;
     return (xorshifted >> rot) | (xorshifted << ((-rot) & 31));
 }
