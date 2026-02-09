@@ -245,7 +245,7 @@ S8_parseI64(S8 num_str)
 	U8 *c = num_str.data;
 
 	if (S8_isNil(num_str)) {
-		tctx_logAppend(tctx_MsgDebug, S8("Failed to parse NIL string"));
+		tctx_logAppend(tctx_MsgError, S8("Failed to parse NIL string"));
 		return 0;
 	}
 

@@ -8,7 +8,7 @@ BitSet_setIdx(BitSet *ba, ISize idx, mem_Arena *a)
 	int i;
 
 	if (ba == NIL || ba->data == NIL) {
-		tctx_logAppend(tctx_MsgDebug, S8("Allocating NIL Bitset (%p)"), ba);
+		tctx_logAppend(tctx_MsgInfo, S8("Allocating NIL Bitset (%p)"), ba);
 	} else {
 		starting_size = ba->len;
 	}
@@ -19,10 +19,10 @@ BitSet_setIdx(BitSet *ba, ISize idx, mem_Arena *a)
 		
 		extend_size = (idx - starting_size + __BitSet_WORD_BITS) / __BitSet_WORD_BITS;
 
-		tctx_logAppend(tctx_MsgDebug, S8("Extending BitSet (pointer %p, length %d) by %d bytes"), idx, ba, ba->len, extend_size);
+		tctx_logAppend(tctx_MsgInfo, S8("Extending BitSet (pointer %p, length %d) by %d bytes"), ba, ba->len, extend_size);
 
 		if (a == NIL) {
-			tctx_logAppend(tctx_MsgDebug, S8("No arena given for extending Bitset (pointer %p, length %d). Doing nothing"), ba, ba->len);
+			tctx_logAppend(tctx_MsgWarn, S8("No arena given for extending Bitset (pointer %p, length %d). Doing nothing"), ba, ba->len);
 			return;
 		}
 
@@ -39,6 +39,7 @@ B32
 BitSet_getIdx(BitSet ba, ISize idx)
 {
 	if (ba.data == NIL || ba.len <= 0) {
+		tctx_logAppend(tctx_MsgError, S8("Failed to index Empty BitSet (length %d), doing nothing"), ba.len);
 		return FALSE;
 	}
 	return (B32)(ba.data[idx / __BitSet_WORD_BITS] & (1 << (idx & (__BitSet_WORD_BITS - 1))));
@@ -48,6 +49,7 @@ void
 BitSet_clearIdx(BitSet *ba, ISize idx)
 {
 	if (ba == NIL || ba->data == NIL || ba->len <= 0) {
+		tctx_logAppend(tctx_MsgError, S8("Failed to clear Empty BitSet (pointer %p), doing nothing"), ba);
 		return;
 	}
 

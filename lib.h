@@ -60,8 +60,8 @@ typedef size_t    USize;
 #error "READ_ONLY undefined for current compiler"
 #endif
 
-#ifndef DEBUG_BUILD
-#define DEBUG_BUILD FALSE
+#ifndef RELEASE_BUILD
+  #define RELEASE_BUILD FALSE
 #endif
 
 /* NULL pointer */
@@ -186,7 +186,7 @@ void mem_ArenaTemp_end(mem_ArenaTemp at);
     	} \
 	} while (0);
 
-#define mem_Slice_pop(s) ((s)->data[--(s)->len - 1])
+#define mem_Slice_pop(s) ((s)->data[--(s)->len])
 
 void mem_Slice_grow(void *slice, ISize size, mem_Arena *a);
 
@@ -353,7 +353,7 @@ enum tctx_MsgKind {
 	tctx_MsgInfo,
 	tctx_MsgWarn,
 	tctx_MsgError,
-	tctx_MsgDebug,
+
 	tctx_MsgKind_LEN,
 };
 
@@ -361,9 +361,15 @@ typedef struct tctx_Msg tctx_Msg;
 struct tctx_Msg {
 	tctx_MsgKind kind;
 	S8 msg;
-	/* todo thread name */
 	ISize line;
 	S8 filename;
+};
+
+typedef struct tctx_MsgFrame tctx_MsgFrame;
+struct tctx_MsgFrame {
+	S8 name;
+	B32 debug_only;
+	mem_Slice_TYPE(tctx_Msg) msg_list;
 };
 
 #define tctx_SCRATCH_ARENA_COUNT 2
@@ -376,17 +382,22 @@ struct ThreadContext {
 	/* TODO stdin */
 
 	mem_Arena *log_arena;
-	/* TODO custom category names */
-	mem_Slice_TYPE(tctx_Msg) log_msg_list;
+	mem_Slice_TYPE(tctx_MsgFrame) log_frames;
 };
 extern THREAD_LOCAL ThreadContext tctx;
 
 /* Get a scratch arena that doesn't conflict with any given arenas */
 mem_ArenaTemp tctx_getScratchArena(mem_Arena **conflicts, ISize num_conflicts);
 
+void tctx_logFrameBegin(S8 name, B32 debug_only);
+/* if buf == NIL, output to stderr 
+ * 
+ * if kind_mask == 0, all msgs are output
+ */
+void tctx_logFrameEnd(U32 kind_mask, Buffer *buf);
+
 #define tctx_logAppend(kind, msg, ...) tctx_logAppendFileLine(__LINE__, S8(__FILE__), (kind), (msg), __VA_ARGS__)
 void tctx_logAppendFileLine(ISize line, S8 filename, tctx_MsgKind kind, S8 msg, ...);
-void tctx_logOutputToConsole(void);
 
 /* Entry Point */
 int entry(S8Slice args);

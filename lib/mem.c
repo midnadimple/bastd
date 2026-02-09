@@ -114,7 +114,7 @@ mem_Arena_push(mem_Arena *a, ISize size)
     U8 *out;
 
     if (a == NIL) {
-        tctx_logAppend(tctx_MsgDebug, S8("Failed to allocate in a NIL arena."));
+        tctx_logAppend(tctx_MsgError, S8("Failed to allocate in a NIL arena"));
         return NIL;
     }
 
@@ -123,7 +123,7 @@ mem_Arena_push(mem_Arena *a, ISize size)
 
     if (new_pos > a->reserve_size) {
         /* out of memory */
-        tctx_logAppend(tctx_MsgError, S8("Out of memory in Arena (pointer %p)."), a);
+        tctx_logAppend(tctx_MsgError, S8("Out of memory in Arena (pointer %p)"), a);
         return NIL;
     }
 
@@ -152,7 +152,7 @@ void
 mem_Arena_pop(mem_Arena *a, ISize size)
 {
     if (a == NIL) {
-        tctx_logAppend(tctx_MsgDebug, S8("passed a NIL arena."));
+        tctx_logAppend(tctx_MsgError, S8("passed a NIL arena"));
         return;
     }
     size = min(size, a->pos - __mem_Arena_BASE_POS);

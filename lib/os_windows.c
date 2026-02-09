@@ -20,7 +20,7 @@ os_File_open(S8 filename, os_FileOpenMode mode)
 	LARGE_INTEGER file_size = {0};
 	mem_ArenaTemp scratch;
 
-	scratch = tctx_getScratchArena(0, NIL);
+	scratch = tctx_getScratchArena(NIL, 0);
 
 	res.name = filename;
 	res.already_exists = attribs != INVALID_FILE_ATTRIBUTES && !(attribs & FILE_ATTRIBUTE_DIRECTORY);
@@ -68,6 +68,9 @@ os_File_write(os_File file, S8 str, ISize offset)
 {
 	DWORD dummy;
 	B32 res;
+	mem_ArenaTemp scratch;
+
+	scratch = tctx_getScratchArena(NIL, 0);
 
 	if (offset < 0) {
 		SetFilePointer((HANDLE)file.raw, 0, NULL, FILE_END);
@@ -79,6 +82,12 @@ os_File_write(os_File file, S8 str, ISize offset)
 
 	SetFilePointer((HANDLE)file.raw, 0, NULL, FILE_BEGIN);
 
+	if (!res) {
+		tctx_logAppend(tctx_MsgError, S8("Failed to write file `%s`. Win32 Error: %s"), file.name, __win32_GetLastErrorS8(scratch.arena));
+	}
+
+	mem_ArenaTemp_end(scratch);
+
 	return res;
 }
 
@@ -87,7 +96,14 @@ os_File_read(os_File file, mem_Arena *arena, ISize start_offset, ISize end_offse
 {
 	ISize read_size;
 	S8 res = {0};
-	assert(arena != NIL);
+	B32 ok = FALSE;
+	mem_ArenaTemp scratch;
+
+	if (arena == NIL) {
+		tctx_logAppend(tctx_MsgError, S8("No arena given for reading file %d"), file.name);
+		return (S8){0};
+	}
+	scratch = tctx_getScratchArena(&arena, 1);
 	
 	/* Read whole size, if no end offset given, else only read until the offset */
 	read_size = (end_offset > 0) ? end_offset : file.size;
@@ -102,10 +118,15 @@ os_File_read(os_File file, mem_Arena *arena, ISize start_offset, ISize end_offse
 
 	/* Read file into buffer, then close it */
 	res = S8_alloc(read_size, arena);
-	ReadFile((HANDLE)file.raw, res.data, (DWORD)read_size, &(DWORD)res.len, 0);
+	ok = ReadFile((HANDLE)file.raw, res.data, (DWORD)read_size, &(DWORD)res.len, 0);
 
 	/* Reset file pointer to start after reading */
 	SetFilePointer((HANDLE)file.raw, 0, NULL, FILE_BEGIN);
+
+	if (!ok) {
+		tctx_logAppend(tctx_MsgError, S8("Failed to read file `%s`. Win32 Error: %s"), file.name, __win32_GetLastErrorS8(scratch.arena));
+		return (S8){0};
+	}
 
 	return res;
 }
@@ -142,19 +163,24 @@ B32
 os_memCommit(void *p, ISize size)
 {
 	void *ret = VirtualAlloc(p, size, MEM_COMMIT, PAGE_READWRITE);
+	assert(ret != NULL);
 	return ret != NULL;
 }
 
 B32
 os_memDecommit(void *p, ISize size)
 {
-	return VirtualFree(p, size, MEM_DECOMMIT);
+	B32 res = VirtualFree(p, size, MEM_DECOMMIT);
+	assert(res);
+	return res;
 }
 
 B32
 os_memRelease(void *p, ISize size)
 {
-	return VirtualFree(p, size, MEM_RELEASE);
+	B32 res = VirtualFree(p, size, MEM_RELEASE);
+	assert(res);
+	return res;
 }
 
 void
@@ -198,8 +224,11 @@ main(int argc, char **argv)
 	tctx.console_error = Buffer_FILE(mem_make(arg_arena, U8, KiB(1)), KiB(1), stdfile);
 
 	tctx.log_arena = mem_Arena_create(MiB(1), KiB(64));
+	tctx_logFrameBegin(S8("bastd"), TRUE);
 
 	res = entry(args);
+
+	tctx_logFrameEnd(0, NIL);
 
 	return res;
 }
