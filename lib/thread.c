@@ -88,7 +88,7 @@ tctx_logFrameEnd(U32 kind_mask, Buffer *buf)
 		if (RELEASE_BUILD) {
 			printBuffer(buf, S8("%s\n"), msg.msg);
 		} else {
-			printBuffer(buf, S8("%s / Line %d: %s\n"), msg.filename, (I64)msg.line, msg.msg);
+			printBuffer(buf, S8("%s / Line %d: %s\n"), msg.filename, (int)msg.line, msg.msg);
 		}
 	}
 }
