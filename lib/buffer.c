@@ -39,12 +39,12 @@ Buffer_appendU8(Buffer *b, U8 c)
 }
 
 void
-Buffer_appendI64(Buffer *b, I64 x)
+Buffer_appendInt(Buffer *b, int x)
 {
 	U8 tmp[64];
 	U8 *end = tmp + isizeOf(tmp);
 	U8 *beg = end;
-	I64 t = x > 0 ? -x : x;
+	int t = x > 0 ? -x : x;
 	do {
 		*--beg = '0' - t % 10;
 	} while (t /= 10);
@@ -148,7 +148,7 @@ __printVaList(Buffer *b, S8 fmt, va_list args)
 				break;
 			/* signed integer */
 			case 'd':
-				Buffer_appendI64(b, va_arg(args, I64));
+				Buffer_appendInt(b, va_arg(args, int));
 				break;
 			/* floating point */
 			case 'f':

@@ -237,10 +237,10 @@ S8_hash64(S8 s)
     return hash;
 }
 
-I64
-S8_parseI64(S8 num_str)
+int
+S8_parseInt(S8 num_str)
 {
-	I64 result = 0;
+	int result = 0;
 	B32 is_negative = FALSE;
 	U8 *c = num_str.data;
 

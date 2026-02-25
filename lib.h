@@ -230,8 +230,8 @@ ISize S8_count(S8 haystack, S8 needle);
  * searched. Returns -1 if the needle isn't in the haystack.
  */
 ISize S8_find(S8 haystack, S8 needle, ISize offset);
-/* Parse a string into an I64 */
-I64 S8_parseI64(S8 num_str);
+/* Parse a string into an integer */
+int S8_parseInt(S8 num_str);
 
 typedef mem_Slice_TYPE(S8) S8Slice;
 
@@ -320,7 +320,7 @@ struct Buffer {
 void Buffer_append(Buffer *b, U8 *src, ISize len);
 void Buffer_appendS8(Buffer *b, S8 s);
 void Buffer_appendU8(Buffer *b, U8 c);
-void Buffer_appendI64(Buffer *b, I64 x);
+void Buffer_appendInt(Buffer *b, int x);
 void Buffer_appendPtr(Buffer *b, void *p);
 void Buffer_appendF64(Buffer *b, F64 x);
 void Buffer_flush(Buffer *b);
