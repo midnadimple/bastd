@@ -69,8 +69,8 @@ Buffer_appendPtr(Buffer *b, void *p)
 void
 Buffer_appendF64(Buffer *b, F64 x)
 {
-	I64 integral;
-	I64 fractional;
+	int integral;
+	int fractional;
 	ISize i;
 	/* 6 d.p. */
 	ISize prec = 1000000;
@@ -87,16 +87,16 @@ Buffer_appendF64(Buffer *b, F64 x)
 	if (x >= (F64)(-1UL>>1)) {
 		Buffer_appendS8(b, S8("inf"));
 	} else {
-		integral = (I64)x;
-		fractional = ((I64)x - integral) * prec;
-		Buffer_appendI64(b, integral);
+		integral = (int)x;
+		fractional = ((int)x - integral) * prec;
+		Buffer_appendInt(b, integral);
 		Buffer_appendU8(b, '.');
 		for (i = prec / 10; i > 1; i /= 10) {
 			if (i > fractional) {
 				Buffer_appendU8(b, '0');
 			}
 		}
-		Buffer_appendI64(b, fractional);
+		Buffer_appendInt(b, fractional);
 	}
 }
 
