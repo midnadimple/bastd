@@ -27,7 +27,7 @@ tctx_getScratchArena(mem_Arena **conflicts, ISize num_conflicts)
 	}
 
 	if (scratch_slot == NIL) {
-		scratch_slot = mem_Arena_create(MiB(64), MiB(1));
+		scratch_slot = mem_Arena_create(-1, -1);
 	}
 
 	res = mem_ArenaTemp_begin(scratch_slot);

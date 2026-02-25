@@ -193,7 +193,7 @@ os_exit(U32 err_code)
 int
 main(int argc, char **argv)
 {
-	mem_Arena *arg_arena = mem_Arena_create(MiB(1), KiB(64));
+	mem_Arena *arg_arena = mem_Arena_create(-1, -1);
 	S8Slice args = {0};
 	os_File stdfile = {0};
 	int i;
@@ -223,7 +223,7 @@ main(int argc, char **argv)
     stdfile.raw = (void*)GetStdHandle((U32)(-11));
 	tctx.console_error = Buffer_FILE(mem_make(arg_arena, U8, KiB(1)), KiB(1), stdfile);
 
-	tctx.log_arena = mem_Arena_create(MiB(1), KiB(64));
+	tctx.log_arena = mem_Arena_create(-1, -1);
 	tctx_logFrameBegin(S8("bastd"), TRUE);
 
 	res = entry(args);

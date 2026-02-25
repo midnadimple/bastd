@@ -82,6 +82,14 @@ mem_Arena_create(ISize reserve_size, ISize commit_size)
     mem_Arena *arena;
     ISize page_size = os_getPageSize();
 
+    if (reserve_size < 0) {
+        reserve_size = mem_Arena_DEFAULT_RESERVE_SIZE;
+    }
+
+    if (commit_size < 0) {
+        commit_size = mem_Arena_DEFAULT_COMMIT_SIZE;
+    }
+
     reserve_size = __mem_AlignUpPow2(reserve_size, page_size);
     commit_size = __mem_AlignUpPow2(commit_size, page_size);
 

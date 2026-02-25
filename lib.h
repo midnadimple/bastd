@@ -76,7 +76,6 @@ typedef size_t    USize;
  * =====================================================================
  */
 
-
 /* Copy memory from one place to another */
 void *mem_copy(void *dst, void *src, ISize n);
 /* Compare the first n bytes of the dst memory block to the first n bytes of
@@ -108,6 +107,14 @@ struct mem_Arena {
 	ISize pos;
 	ISize commit_pos;
 };
+
+#ifndef mem_Arena_DEFAULT_RESERVE_SIZE
+#define mem_Arena_DEFAULT_RESERVE_SIZE MiB(64)
+#endif
+
+#ifndef mem_Arena_DEFAULT_COMMIT_SIZE
+#define mem_Arena_DEFAULT_COMMIT_SIZE MiB(1)
+#endif
 
 /* Create an arena using OS functions */
 mem_Arena *mem_Arena_create(ISize reserve_size, ISize commit_size);
